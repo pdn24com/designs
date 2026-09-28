@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Daria Engineering Handoff</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/doc.css">
+</head>
+<body>
+<nav class="topnav" id="topnav"></nav>
+<main class="wrap">
+<header class="hero">
+  <div class="kicker">Part 4 · Engineering handoff</div>
+  <h1>Contracts, behaviour, content, rollout</h1>
+  <p class="lede">What an Android team needs to build Dock on the existing shared design system without reading the design pages: component and state contracts, behaviour and motion specifications, content rules, accessibility requirements, a staged rollout, and a coverage ledger for every current and planned capability.</p>
+  <div class="meta"><span>Screen IDs (S01–S22) match the prototype’s annotation panel</span><span>Contract references point to feature-contracts.md sections</span></div>
+  <div class="toc"><a href="#components">Component contracts</a><a href="#behaviour">Behaviour specs</a><a href="#content">Content rules</a><a href="#a11y">Accessibility requirements</a><a href="#rollout">Staged rollout</a><a href="#ledger">Coverage ledger</a><a href="#reuse">Reused ideas and sources</a></div>
+</header>
+
+<section id="components">
+<h2>Component and state contracts</h2>
+<div class="tbl"><table>
+<thead><tr><th>Component</th><th>Inputs</th><th>States</th><th>Events</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><b>Dock</b></td><td>session?, timerStatus, searchEnabled, compact (large text or width &lt; 330 dp)</td><td>no-session (search only) · session · compact (single row) · hidden (editor, picker, gates without session)</td><td>openPlayer, togglePlay, next, openSearch</td><td>Translucent surface (18 dp blur, 86% alpha) with solid fallback when the system requests reduced transparency or the design system flags blur cost. Never covers the last list row: lists add bottom inset = dock height.</td></tr>
+<tr><td><b>MiniPlayer</b></td><td>track, playing, progress (0–1 or null), timer {none|duration(min)|endOfSong}, error?</td><td>paused · playing · error (red subtitle “File missing”) · timer-notice (“Paused by sleep timer”)</td><td>open (full-row), togglePlay, next</td><td>Progress bar hidden when duration is unknown. Timer glyph is informational; it is part of the subtitle’s accessible name.</td></tr>
+<tr><td><b>LensRow / LensPicker</b></td><td>lenses[5], selected, largeText</td><td>strip (default) · picker (font scale ≥ 1.3 or width &lt; 360 dp)</td><td>select(lens)</td><td>Selected lens persists. Strip never clips a label: it lays out at equal spacing and scrolls only if labels exceed width.</td></tr>
+<tr><td><b>HiddenPill</b></td><td>count, active (any library rule differs from default)</td><td>hidden · visible</td><td>open(WhyHiddenSheet)</td><td>Amber semantic colour; accessible name includes the count and purpose.</td></tr>
+<tr><td><b>SongRow</b></td><td>track, current?, playing?, hidden?, missing?, selection?, sub (artist by default)</td><td>default · current (accent title + bars) · hidden (55% + badge) · missing (badge, no play) · selectable (checkbox) · large-text (wrapping)</td><td>primary(tap), more(⋮)</td><td>One accessible name for the row: “Title, Artist, [now playing|hidden folder|file missing]”. Duration is inside the name.</td></tr>
+<tr><td><b>SongMenuSheet</b></td><td>track, context (library|collection|playlist|queue|player)</td><td>groups: session · keep · go to · file; playlist context adds “Remove from this playlist”; queue context adds move/remove</td><td>playNow, playNext, addQueue, addPlaylist, goAlbum, goArtist, goFolder, info, share, favouriteToggle</td><td>Verbs and order are fixed across contexts. Heart lives in the header.</td></tr>
+<tr><td><b>NowPlaying</b></td><td>track, source, faces[cover, lyrics, queue], face, timer, notice</td><td>cover · lyrics(none|plain|synced) · queue(normal|select) · error (missing) · unknown-duration · landscape</td><td>collapse, face(select), seek, transport, favouriteToggle, openTimer, openAddPlaylist, overflow</td><td>Transport, timeline, title and chips are fixed; only the face region changes. Tint = dominant hue of the cover mixed with surface; fallback = neutral tint.</td></tr>
+<tr><td><b>Timeline</b></td><td>position, duration|null, buffering?</td><td>seekable · disabled (unknown duration or buffering, dashed)</td><td>seek(seconds)</td><td>Always LTR. Slider with valuetext “m:ss of m:ss”. 44 dp tall hit area.</td></tr>
+<tr><td><b>QueueFace</b></td><td>occurrences[], currentOcc, selection?</td><td>list · history-expanded · select</td><td>jump(occ), move(occ, ±1 or drop index), remove(occ), select, removeSelected, overflow(save, clear)</td><td>Occurrence ids are stable across reorder. Current item cannot be removed in select mode; it can via the player error card.</td></tr>
+<tr><td><b>SleepTimerSheet</b></td><td>timer state (off|duration{end,total}|endOfSong{occ}), draft?, pending?, saveFailed?, sessionAvailable</td><td>off · running · endOfSong · draft-over-running · invalid-custom · plus-refused · pending · save-failed · no-session</td><td>start(preset|eos|custom), plus10, change, apply, keepCurrent, cancel, retrySave</td><td>Implements feature-contracts “Sleep timer: latest contract” verbatim. Custom input accepts Latin, Persian and Arabic-Indic digits.</td></tr>
+<tr><td><b>SongInfo</b></td><td>track, tags{source}, file, audio, lyricsPresence, indexPending?</td><td>default · non-editable (reason) · index-pending banner</td><td>edit, share, openLyrics</td><td>Sections: tags (source named), lyrics, file, audio. “Not in this file” lists absent tags.</td></tr>
+<tr><td><b>TagEditor</b></td><td>track, original tags, draft, coverMode (keep|new|remove), status</td><td>clean · dirty · invalid · saving · denied · externallyChanged · writeFailed · noSpace · busy (another save)</td><td>change(field), coverMode, save, discardDialog, reloadTags, restoreOriginal</td><td>Save enabled only when dirty and valid. Bottom panel: playing/current warning + file-write statement. Back with dirty draft → discard dialog. Editable: title, artist, album, album artist, year, track, genre. Disc shown read-only.</td></tr>
+<tr><td><b>WhyHiddenSheet</b></td><td>rules: hiddenFolders[], minDuration, unknownHidden</td><td>list</td><td>showFolder(key), changeDuration, openSettings</td><td>Each rule row carries its count and a one-tap recovery.</td></tr>
+<tr><td><b>Gate</b></td><td>kind: first | denied | blocked | loading | empty | readError</td><td>one per kind</td><td>askPermission, openAppSettings, checkAgain, retry</td><td>Gate replaces the lens row and list; dock remains only if a session exists.</td></tr>
+<tr><td><b>Snackbar</b></td><td>text, undo?</td><td>visible (6 s) · replaced</td><td>undo</td><td>Never rendered while a sheet, dialog or system UI is open; positioned above the dock, or above the chips in the player.</td></tr>
+<tr><td><b>Settings screens</b></td><td>folders[{name,path,count,duration,shown}], minDuration (0|15|30|60|120), keepUnknown, appearance, autoRefresh status</td><td>default · refreshing · observer-unavailable</td><td>toggleFolder, setMinDuration, toggleUnknown, setAppearance, refreshNow</td><td>All changes immediate with Undo. Counts per option computed from the index; if computation exceeds ~300 ms show “…” then fill.</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="behaviour">
+<h2>Behaviour specifications</h2>
+<div class="cols two">
+<div class="panel"><h3>Library visibility (Settings, future)</h3>
+<ul class="tight">
+<li>Visible(track) = folder shown AND (duration unknown ? keepUnknown : minDuration == Off OR duration ≥ minDuration). Equality is kept.</li>
+<li>Visibility affects: Songs, Albums, Artists, Folders lists and counts; collection contents; search results; the add-songs picker.</li>
+<li>Visibility does not affect: files; playlist membership; favourites; play history; the current queue; the current track. Playlists and Favourites show hidden members under an expandable footer with a count; they remain playable (owner decision D7).</li>
+<li>New folders discovered by the index are shown. Hidden folders are stored by full path + storage identity; a folder that disappears from the index keeps its hidden flag.</li>
+<li>Album and artist counts are recomputed from visible tracks only.</li>
+<li>Search over hidden content returns nothing visible, but the results screen shows “n matches are in hidden folders” with a link to Settings › Folders. Minimum-length hidden matches are not counted (they are usually noise).</li>
+</ul></div>
+<div class="panel"><h3>Queue and playback</h3>
+<ul class="tight">
+<li>Play now from a list replaces the queue with that list’s visible items in the current sort and starts at the tapped item; source = list name.</li>
+<li>Play next inserts after the current occurrence; Add to queue appends. Both post a named snackbar with Undo that removes that occurrence only.</li>
+<li>Reorder never changes the current occurrence’s identity. Removing items before the current one adjusts the index.</li>
+<li>Clear queue: confirmation names the consequences (stop, empty, files kept, timer cancelled).</li>
+<li>Unavailable file: playback stops on that occurrence, error card with “Play next song” and “Remove from queue”; no automatic skip; Share of that file is refused with a message.</li>
+<li>Unknown duration: no progress bar in the mini player; dashed non-seekable timeline; “Unknown length” label; the end-of-song timer shows no “about n min left”.</li>
+</ul></div>
+<div class="panel"><h3>Sleep timer presentation</h3>
+<ul class="tight">
+<li>Chip states: off (“Sleep timer”), duration (ring + “n min”, updates per minute; per second in the last minute), end of song (“After this song”). Mini-player glyph mirrors the state.</li>
+<li>+10 refusal: inline amber banner with the reason and a Change time button; the timer is untouched.</li>
+<li>Change: draft state inside the same sheet; running countdown is shown in text; Keep current timer closes without change; Apply replaces at that moment. If the timer expires while the draft is open, the draft stays, the countdown text becomes “Sleep timer finished”, and only Start arms a new one.</li>
+<li>Save failure: red banner with Retry saving; Retry persists the current state without touching the deadline.</li>
+<li>Expiry: quiet pause; “Paused by sleep timer · Stopped at hh:mm” notice in the player and the mini player until dismissed or playback is started deliberately.</li>
+</ul></div>
+<div class="panel"><h3>Tag editing and sharing</h3>
+<ul class="tight">
+<li>Editor opens only for MP3 files that meet the contract (Android 11+, supported tag structure, ≤ 300 MiB). Others show the reason in Song info.</li>
+<li>Numeric fields normalise Persian/Arabic-Indic digits and preview “Will be saved as …”. Year must be four digits; track must be n or n/m.</li>
+<li>Empty value removes the tag; unreadable values are left untouched unless replaced (show “unreadable” placeholder).</li>
+<li>Save sequence: consent (Android) → saving (transport may pause briefly; state announced) → saved-to-file → index-pending banner in Song info until the index reports the new values.</li>
+<li>Failure states and their single recovery: denied → Try again; externally changed → Reload tags (draft kept); write failed → Restore original + Try again; no space → Try again after freeing; another save in progress → wait indicator.</li>
+<li>Share hands the actual file to Android’s chooser with temporary read access; feedback for missing file, denied access, no receiving app.</li>
+</ul></div>
+<div class="panel"><h3>Lyrics (future, first release)</h3>
+<ul class="tight">
+<li>Sources: embedded USLT (plain) and SYLT (synced) frames in ID3; a per-song lyrics file (.lrc or .txt) chosen through the system file picker and associated by file identity, stored in app data.</li>
+<li>Synced: current line follows position; tapping a line seeks. Plain: static text labelled “Not synced to the music”. None: explanation + “Add lyrics file”.</li>
+<li>Later, separately: a lyrics folder matched by file name (Settings › Lyrics shows the placeholder now); any online provider would need a rights decision and network permission and is not assumed.</li>
+</ul></div>
+<div class="panel"><h3>Motion budget</h3>
+<p>See the <a href="design.html#motion">motion table</a>. Summary: player open 280–360 ms; face switch ≤ 220 ms; tint 400–600 ms; sheets 260–320 ms; nothing loops except the current-row bars. All translations become 120 ms fades under Android’s “Remove animations”.</p></div>
+</div>
+</section>
+
+<section id="content">
+<h2>Content rules</h2>
+<ul class="tight">
+<li><b>Verbs are fixed:</b> Play now · Play next · Add to queue · Add to playlist · Favourite · Song info · Share file · Hide from library · Show in library · Remove from queue · Remove from this playlist.</li>
+<li><b>Consequence sentences</b> accompany anything that could be mistaken for deletion: “The songs stay on this phone.” “Files are not deleted.” “The file stays on your phone.”</li>
+<li><b>Snackbars name the object:</b> “‘Gisooye Baran’ plays next”, “‘Quick Share’ hidden · 718 songs”. Undo is the only action a snackbar may carry.</li>
+<li><b>Counts use tabular numerals</b> and locale digits (Persian digits in Persian). File names, paths, bitrates and codes stay in Latin digits.</li>
+<li><b>Titles from file names</b> are marked in Song info (“From the file name — no title tag”), never in list rows by default.</li>
+<li><b>Future features</b> are labelled in the product only where the person can act: the Lyrics folder row says “Not connected · later release”. The Lyrics face itself needs no label because its empty state explains the source.</li>
+<li><b>Persian copy</b> exists for every visible string in the prototype (see <code>assets/proto.js</code>, object <code>T</code>); it is a first draft for a native reviewer, not final localisation.</li>
+</ul>
+</section>
+
+<section id="a11y">
+<h2>Accessibility requirements (build acceptance)</h2>
+<div class="tbl"><table>
+<thead><tr><th>Requirement</th><th>Acceptance check</th></tr></thead>
+<tbody>
+<tr><td>Every interactive element has a name that includes its object (“More options: Benevis”).</td><td>TalkBack traversal of S01, S10, S12, S13, S15, S17 reads no unlabelled button.</td></tr>
+<tr><td>Reading order matches visual order; notices precede the content they concern.</td><td>Linear navigation on S10 with a notice reaches: source, notice, faces, face content, slider, transport, chips.</td></tr>
+<tr><td>48 dp minimum targets; 44 dp allowed only inside queue rows.</td><td>Layout inspector on all screens at 100% and 160% text.</td></tr>
+<tr><td>No gesture-only paths.</td><td>Complete T1–T7 and R1 with taps only, TalkBack on.</td></tr>
+<tr><td>Font scale up to 200%: nothing clipped, nothing hidden.</td><td>Screenshots at 130%, 160%, 200% on 320-dp and 390-dp widths.</td></tr>
+<tr><td>Contrast ≥ 4.5:1 text, ≥ 3:1 icons and control edges, light and dark, over every player tint.</td><td>Automated contrast check on the 10 palette tints and the fallback.</td></tr>
+<tr><td>RTL mirroring with per-field bidi isolation; timeline LTR.</td><td>Persian locale screenshots of S01, S10, S12, S19–S21.</td></tr>
+<tr><td>Reduced motion respected.</td><td>“Remove animations” on: no translation animations, static current-row glyph.</td></tr>
+<tr><td>Slider semantics for the timeline; disabled state announced when duration is unknown.</td><td>TalkBack reads “Seek, slider, 0:01 of 3:58” and “disabled” on S10 unknown-duration state.</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="rollout">
+<h2>Staged rollout</h2>
+<ol class="walk">
+<li><b>Stage 0 · Foundations (no visible change).</b> Tokens (colour, type scale caps, radii), Daria tile generator with cache, one SongMenuSheet component, snackbar-with-Undo pattern, Persian string review. Risk: low.</li>
+<li><b>Stage 1 · Library and dock.</b> Dock with mini player and search field; lens row with large-text picker; global typed search; authored-first Playlists; sort pill. Keep the existing Now Playing. Risk: medium (new composition; blur fallback). Gate: T1, T2 pass with TalkBack; no list row hidden under the dock at 200% text.</li>
+<li><b>Stage 2 · Player faces.</b> Now Playing with Cover and Up next faces, fixed transport, artwork tint, timer chip, mini-player timer glyph; remove the overflow timer entry. Landscape arrangement. Risk: medium. Gate: T3, T5 pass; queue Undo verified; landscape clipping resolved on the device that reported it.</li>
+<li><b>Stage 3 · Song info and editor presentation.</b> Source sections, non-editable reason, changed-field marks, normalisation preview, six failure states, index-pending banner, corrected playing/current copy. No contract change. Risk: low–medium. Gate: T7 and every failure state exercised on an MP3 test set.</li>
+<li><b>Stage 4 · Settings (future).</b> Folders, minimum length with counts and unknown-length switch, appearance, refresh; hidden pill, explainer sheet, playlist and favourites footers, search hint. Owner decisions D6, D7 required first. Risk: medium (count performance on large libraries). Gate: T6 passes; hiding 718 songs recounts in under 300 ms or falls back to a draft model.</li>
+<li><b>Stage 5 · Lyrics (future).</b> Embedded USLT/SYLT reading, per-song file import, Lyrics face, Song info lyrics row. Owner decision D8 required. Optional later: lyrics folder; online provider only with a rights decision.</li>
+<li><b>Proposals awaiting decision, any stage:</b> Save queue as playlist (D14); Stage mode experiment (validation plan E3).</li>
+</ol>
+</section>
+
+<section id="ledger">
+<h2>Coverage ledger</h2>
+<p>Every current and planned capability, its disposition in the recommended design, its source evidence and the screens that carry it. Deferring a current feature would be a scope change requiring an owner decision; none is deferred.</p>
+<div class="tbl"><table>
+<thead><tr><th>Capability</th><th>Disposition</th><th>Source evidence</th><th>Proposed flow / screens</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Open into library; Songs list with count</td><td><span class="tag obs">Retained</span></td><td>01</td><td>S01</td><td>Last lens remembered.</td></tr>
+<tr><td>Category switching (5)</td><td><span class="tag obs">Redesigned</span></td><td>01, 03, 11, 13, 15</td><td>S01–S05, lens picker</td><td>No clipped labels; picker at large text.</td></tr>
+<tr><td>Sort title/artist/added, toggle, persist</td><td><span class="tag obs">Retained</span></td><td>02; contract</td><td>Sort sheet from S01</td><td>Direction indicator on the selected option.</td></tr>
+<tr><td>Play / shuffle a collection or the library</td><td><span class="tag obs">Retained</span></td><td>01, 12, 14, 16</td><td>S01 shuffle; S06 Play/Shuffle</td><td></td></tr>
+<tr><td>Search songs and derived collections; no-match state</td><td><span class="tag obs">Redesigned</span></td><td>38, 39; contract</td><td>Dock → S09</td><td>Typed results; recents; hidden-folder hint.</td></tr>
+<tr><td>Permission states; empty; first-load; read failure</td><td><span class="tag con">Designed (contract)</span></td><td>feature-contracts.md; NOT_RUN</td><td>Gate variants on S01</td><td>Search has no target before access; the dock hides its field on gates.</td></tr>
+<tr><td>Automatic refresh; manual Refresh/Check again/Retry; retained catalogue on failure; observer unavailable</td><td><span class="tag con">Designed (contract)</span></td><td>feature-contracts.md</td><td>Banner on S01; S19 Refresh row</td><td>Pull-to-refresh not reintroduced.</td></tr>
+<tr><td>Mini player</td><td><span class="tag obs">Redesigned</span></td><td>01–16, 27</td><td>Dock</td><td>Progress bar; timer glyph; error subtitle.</td></tr>
+<tr><td>Now Playing: transport, seek, shuffle, repeat, source, artwork fallback, favourite</td><td><span class="tag obs">Redesigned</span></td><td>18, 40; contract</td><td>S10</td><td>Faces; tint; unknown-duration timeline.</td></tr>
+<tr><td>Landscape Now Playing</td><td><span class="tag con">Redesigned</span></td><td>Prior QA clipping report</td><td>S10 landscape</td><td>Two-column composition.</td></tr>
+<tr><td>Notification / lock screen / external controls</td><td><span class="tag obs">Retained</span></td><td>41; contract</td><td>System</td><td>Unchanged; end-of-song retargeting on external next/previous per contract.</td></tr>
+<tr><td>Track actions (library and player menus)</td><td><span class="tag obs">Redesigned</span></td><td>28, 37</td><td>S13, player overflow</td><td>One grouped vocabulary.</td></tr>
+<tr><td>Play next / Add to queue with named confirmation</td><td><span class="tag con">Redesigned</span></td><td>contract; 37</td><td>S13 → snackbar</td><td>Undo added.</td></tr>
+<tr><td>Queue: occurrences, selection, reorder, remove with Undo, clear with confirmation</td><td><span class="tag obs">Redesigned</span></td><td>34, 35; contract</td><td>S12, queue menus, clear dialog</td><td>Stable current identity; multi-select.</td></tr>
+<tr><td>Favourites</td><td><span class="tag obs">Redesigned</span></td><td>36; 18 heart</td><td>Heart in S10/S13; switch in S14; Favourites tile</td><td>Not a playlist row.</td></tr>
+<tr><td>Playlists: create, rename, delete with confirm/Undo, add/remove, drafts, blank/duplicate feedback</td><td><span class="tag obs">Retained</span></td><td>03–10, 36; contract</td><td>S02, S07, S08, dialogs</td><td>Authored first; discard guard on picker.</td></tr>
+<tr><td>Smart collections (favourites, recently played, most played, recently added)</td><td><span class="tag obs">Retained</span></td><td>03</td><td>S02 tiles → S06</td><td>Not renameable; hidden members footer.</td></tr>
+<tr><td>Song info with tag/index sources, file and audio facts</td><td><span class="tag obs">Redesigned</span></td><td>29, 30</td><td>S16</td><td>Adds lyrics row and file-name-title marker.</td></tr>
+<tr><td>MP3 tag editing: fields, validation, digits, cover keep/change/remove, consent, save states, failures, restore original</td><td><span class="tag obs">Redesigned</span></td><td>31, 32; contract</td><td>S17 and its states</td><td>Contract unchanged; presentation consolidated.</td></tr>
+<tr><td>Non-MP3 formats: info and share without editing</td><td><span class="tag con">Designed (contract)</span></td><td>contract</td><td>S16 non-editable variant</td><td>Reason stated.</td></tr>
+<tr><td>Share actual audio file; missing/denied/no-app feedback</td><td><span class="tag obs">Retained</span></td><td>33; contract</td><td>S16/S13 → system chooser</td><td>Simulated in prototype.</td></tr>
+<tr><td>Unavailable file playback feedback (no auto-skip)</td><td><span class="tag con">Designed (contract)</span></td><td>contract</td><td>S10 error card; row badge</td><td></td></tr>
+<tr><td>Sleep timer: full contract</td><td><span class="tag obs">Retained (presentation redesigned)</span></td><td>19–27; contract</td><td>S15, chip, mini glyph, notices</td><td>Overflow entry removed (D9).</td></tr>
+<tr><td>Timer persistence, restoration, save-failure Retry</td><td><span class="tag con">Designed (contract)</span></td><td>contract</td><td>S15 save-failed; S10 notice</td><td></td></tr>
+<tr><td>Settings: folders</td><td><span class="tag own">Future · designed</span></td><td>product-brief.md</td><td>S19, S20, S22, footers, hint</td><td>Owner decisions D6, D7.</td></tr>
+<tr><td>Settings: minimum length, unknown duration</td><td><span class="tag own">Future · designed</span></td><td>product-brief.md</td><td>S21</td><td>Equality kept; unknown kept by default.</td></tr>
+<tr><td>Settings: System/Light/Dark</td><td><span class="tag own">Future · designed</span></td><td>product-brief.md</td><td>S19</td><td>Immediate.</td></tr>
+<tr><td>Lyrics</td><td><span class="tag own">Future · designed</span></td><td>product-brief.md</td><td>S11, S16 row, S19 placeholder</td><td>Local-first MVP (D8).</td></tr>
+<tr><td>Save queue as playlist</td><td><span class="tag pro">Proposal</span></td><td>—</td><td>S12 overflow</td><td>Needs owner decision (D14).</td></tr>
+<tr><td>Android Auto, widgets, Wear, casting, streams, scrobbling</td><td><span class="tag unk">Not designed</span></td><td>Roadmap language only</td><td>—</td><td>Not inferred from Figma or brief.</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="reuse">
+<h2>Reused ideas and their sources</h2>
+<p>Listed so precedent is visible, not as justification. Each was kept because it scored on a criterion in the <a href="concepts.html#criteria">evaluation</a>.</p>
+<ul class="tight">
+<li>Direct library entry, five categories, persistent mini player: current app (01), Round 1 Lens, Round 2.</li>
+<li>Timer sheet structure, copy about pauses and calls, invalid-input feedback, Keep current: current app (19–24).</li>
+<li>Editor warnings about the actual file and Android consent: current app (32).</li>
+<li>Delete/clear consequence sentences: current app (09, 35).</li>
+<li>Settings gear on the library header; Library/Appearance grouping; folder-rule sentence; large-text category picker; Vazirmatn: Round 2.</li>
+<li>Waveform seek with disabled scrubbing while buffering; independent shuffle/repeat; artwork-derived colour with a neutral fallback; queue rows with handles: Figma F02, F03.</li>
+<li>Global search as a top-level affordance: Figma F05 (relocated).</li>
+<li>Resume-and-revisit as a job: Round 1 Sessions (served by the mini player and Recently played tile rather than a page).</li>
+<li>Originated here: the dock; player faces; the Daria tile; hidden-content pill/sheet/footers/hint; grouped single song menu; changed-field marks and normalisation preview; end-of-song chip label; “Paused by sleep timer” notice placement.</li>
+</ul>
+</section>
+<footer class="site">Part 4 of the Daria redesign dossier. Next: <a href="validation.html">Validation plan</a>.</footer>
+</main>
+<script src="assets/doc.js"></script>
+</body>
+</html>

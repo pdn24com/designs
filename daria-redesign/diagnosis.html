@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Daria Product Diagnosis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/doc.css">
+<link rel="stylesheet" href="assets/kit.css">
+</head>
+<body>
+<nav class="topnav" id="topnav"></nav>
+<main class="wrap">
+<header class="hero">
+  <div class="kicker">Part 1 · Product diagnosis</div>
+  <h1>What Daria does well, where it hurts, and what is unknown</h1>
+  <p class="lede">An evidence-based reading of the installed app (version 7.1.0.0 on Hormoz, Android 15), the two earlier redesign rounds and the Figma reference. Every claim carries its evidence class; a screenshot proves a visible state and nothing more.</p>
+  <div class="legend"><span><span class="tag obs">Observed</span> seen in a capture</span><span><span class="tag con">Contract</span> documented source behaviour</span><span><span class="tag own">Owner requirement</span> requested, may not exist yet</span><span><span class="tag pro">Proposal</span> a design idea, mine or a reference’s</span><span><span class="tag unk">Unknown</span> evidence absent or conflicting</span></div>
+  <div class="toc"><a href="#inventory">Evidence inventory</a><a href="#strengths">Strengths</a><a href="#problems">Problems</a><a href="#opportunities">Opportunities</a><a href="#capabilities">Capability map</a><a href="#questions">Questions answered</a><a href="#open">Open questions and assumptions</a></div>
+</header>
+
+<section id="inventory">
+<h2>Evidence inventory</h2>
+<div class="tbl"><table>
+<thead><tr><th>Source</th><th>What it establishes</th><th>What it cannot establish</th></tr></thead>
+<tbody>
+<tr><td>41 device captures <span class="ev">current-app/01–41</span>, manifest with SHA-256 per image</td><td>Visible states of 17 journeys on one phone, English, light theme, 825-song library. Executed vs surface-shown per capture.</td><td>Persistence, motion, audio, background behaviour, accessibility, RTL, dark, landscape, any error or permission state (all NOT_RUN per flows.md).</td></tr>
+<tr><td>Feature contracts <span class="ev">feature-contracts.md</span></td><td>Business rules for library freshness, queue occurrences, playlists, song info and editing, sharing, the sleep timer lifecycle, persistence and failure states.</td><td>That every rule is exercised on the photographed build; prior QA is reported, not rerun.</td></tr>
+<tr><td>Product brief <span class="ev">product-brief.md</span></td><td>Owner requirements: local-only v1, Persian/RTL and English, Settings and Lyrics as future scope, the folder invariant, brand expressiveness that must earn its cost.</td><td>Market demand, user research, a mandated palette.</td></tr>
+<tr><td>Round 1 studies <span class="ev">references/round-1</span></td><td>Three alternative entry structures and component options, with their own open questions.</td><td>Any usability result; the interactions are shallow simulations.</td></tr>
+<tr><td>Round 2 refined proposal <span class="ev">references/round-2</span></td><td>A coherent library, player and settings proposal with a folder/duration draft model. Browser-checked at 320/390 px, light/dark, 1.8× text.</td><td>Android rendering, screen readers, the latest timer and editor contracts (it predates them).</td></tr>
+<tr><td>Figma captures <span class="ev">figma/F01–F10</span></td><td>Three-tab navigation intent, waveform seek annotations, queue sheet with 32% scrim, glass studies, RTL home and search compositions.</td><td>Implemented behaviour; complete category inventory; a mandated palette; the pilot frames are unfinished.</td></tr>
+<tr><td>Validation record <span class="ev">validation-record.md</span></td><td>What was checked in packaging the dossier.</td><td>Release, accessibility or device qualification.</td></tr>
+</tbody></table></div>
+<p>I read all 67 images, the seven offline previews (rendered headless to confirm content: Round 2’s lyrics sheet shows “no local lyrics recorded”, its queue sheet says the library filter does not change the current queue, its folder rules screen lists Off / 30 s / 1 min / 2 min and keeps unknown duration), and every document. I did not have device access, so nothing below is a new observation.</p>
+</section>
+
+<section id="strengths">
+<h2>Strengths worth preserving</h2>
+<div class="cols">
+<div class="panel"><h3>The contracts are already careful</h3><p>The sleep timer distinguishes a draft from an active deadline, rejects 181 minutes with a reason and keeps the running timer on “Keep current” <span class="tag obs">Observed</span> <span class="ev">21–23</span>. The editor says it rewrites the actual file and that Android may ask <span class="tag obs">Observed</span> <span class="ev">32</span>. Delete and Clear both say the songs stay on the phone <span class="ev">09, 35</span>. The redesign keeps these semantics and their copy structure.</p></div>
+<div class="panel"><h3>Direct entry into the library</h3><p>The app opens on Songs with the count, sort and shuffle visible and a persistent mini player <span class="tag obs">Observed</span> <span class="ev">01</span>. Round 2 kept this for a reason: it is the shortest route to a person’s files. No reference proves a home page would be shorter.</p></div>
+<div class="panel"><h3>Recovery vocabulary exists</h3><p>Undo after playlist deletion <span class="ev">10</span>, a query-specific no-match state <span class="ev">39</span>, a clear-queue confirmation <span class="ev">35</span>, invalid-input feedback <span class="ev">22</span>. The contracts add retained-catalogue refresh failure and draft-preserving save errors <span class="tag con">Contract</span>. These are the seeds of a consistent recovery system.</p></div>
+<div class="panel"><h3>Song info is honest about sources</h3><p>“From the file’s tags (ID3v2.3)”, “Not in this file: Album artist, Track number, Disc, Genre”, plus file and audio facts <span class="tag obs">Observed</span> <span class="ev">29–30</span>. This is rare in players and worth making more visible.</p></div>
+</div>
+</section>
+
+<section id="problems">
+<h2>Problems, ranked by effect on the experience</h2>
+<div class="tbl"><table>
+<thead><tr><th>#</th><th>Problem</th><th>Evidence</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>P1</td><td><b>Global actions are scattered across corners.</b> Search is a header icon; sort, shuffle and play are a second row; the player’s secondary actions are three bottom chips; the library row menu is a separate sheet with a different order from the player’s menu.</td><td><span class="tag obs">Observed</span> <span class="ev">01, 28, 37</span></td><td>Search, the most general way into an 825-song library, is the farthest control from the thumb. Two action vocabularies for the same song.</td></tr>
+<tr><td>P2</td><td><b>The queue hides the transport.</b> Queue is a sheet over the player; the play button and timeline are covered while reordering.</td><td><span class="tag obs">Observed</span> <span class="ev">34–35</span>; same in Figma F03 and Round 2</td><td>Reorder-then-check requires closing and reopening. Occurrence-aware selection and Undo (contract) have no visible home.</td></tr>
+<tr><td>P3</td><td><b>Hidden-content rules have no user-facing explanation yet.</b> The 30 s minimum-duration filter already applies silently; folder hiding is an owner requirement with a strict invariant (files, playlists and queue preserved).</td><td><span class="tag con">Contract</span> <span class="tag own">Owner requirement</span> <span class="ev">product-brief.md</span></td><td>Counts will change, playlists will show songs that browsing cannot find, and search will miss files that exist. Without explanation this reads as data loss.</td></tr>
+<tr><td>P4</td><td><b>Missing artwork is the common case, and the fallback is a letter.</b> 24 of the 41 captured rows use a coloured initial, including “0” for “01 Pizza”.</td><td><span class="tag obs">Observed</span> <span class="ev">01, 06, 13, 34</span></td><td>Initials from file-derived titles carry no meaning and make the album grid look broken. Any artwork-led concept inherits this.</td></tr>
+<tr><td>P5</td><td><b>File-derived titles are presented as titles.</b> “01_Ghoroub”, “Cheghadr Mahi ~ UpMusic”, “Diana-Hadad_01.Amaneh” appear as song titles with no indication that they came from the file name.</td><td><span class="tag obs">Observed</span> <span class="ev">01, 34</span>; contract requires the source to be identified <span class="ev">feature-contracts.md</span></td><td>People cannot tell what editing will fix, and search matches noise words like “UpMusic”.</td></tr>
+<tr><td>P6</td><td><b>The timer’s status is visible but its controls are scattered.</b> Status appears in a chip, an overflow entry, and a non-interactive mini-player label.</td><td><span class="tag obs">Observed</span> <span class="ev">26–28</span></td><td>Three placements, one of which cannot be tapped. Fine for a demo; confusing at 2 a.m.</td></tr>
+<tr><td>P7</td><td><b>Copy/state mismatch in the editor.</b> “This song is playing. It may pause for a moment while saving” while the song is paused.</td><td><span class="tag obs">Observed</span> <span class="ev">31</span>; flagged in flows.md</td><td>Small, but it is the sentence that precedes a file write. It should distinguish “current song” from “playing”.</td></tr>
+<tr><td>P8</td><td><b>Landscape clips Now Playing.</b></td><td><span class="tag con">Reported prior QA</span> <span class="ev">feature-contracts.md</span></td><td>Needs a designed compact arrangement, not a scaled portrait.</td></tr>
+<tr><td>P9</td><td><b>Category strip clips at the edge.</b> “Folde…” is cut in every library capture; at large text this becomes unusable.</td><td><span class="tag obs">Observed</span> <span class="ev">01, 03, 11, 13, 15</span></td><td>Discoverability of Folders depends on noticing a half-word.</td></tr>
+<tr><td>P10</td><td><b>Playlists overview buries authored playlists.</b> Four smart tiles and a New tile come first; authored playlists are below the fold.</td><td><span class="tag obs">Observed</span> <span class="ev">03</span></td><td>The thing people made is the hardest thing to reach in its own lens.</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="opportunities">
+<h2>Opportunities</h2>
+<ul class="tight">
+<li><b>One action vocabulary.</b> Play now / Play next / Add to queue / Add to playlist / Favourite / Song info / Share, grouped by consequence (this session, keep, go to, file), identical in every menu.</li>
+<li><b>Explain hidden content where it is felt.</b> A single “n hidden” affordance that appears on counts, playlists and empty search, opening one sheet that lists why and offers one-tap recovery. This turns the folder invariant into something people can see.</li>
+<li><b>A player with faces instead of sheets.</b> Cover, Lyrics and Up next as tabs of one player with one transport; the queue stops being a modal.</li>
+<li><b>A Daria fallback tile.</b> A generated, per-album tinted tile replaces initials, so a library without embedded art still looks like a library.</li>
+<li><b>Source-aware titles.</b> A subtle “from file name” marker in Song info and in the editor, with a “file name” badge in rows only when the person opts in (default off to keep rows quiet).</li>
+<li><b>Settings and Lyrics as clearly future.</b> Both designed in full, with first-release scopes that need no network, no rights agreement and no new data source.</li>
+</ul>
+</section>
+
+<section id="capabilities">
+<h2>Capability and status map</h2>
+<p>Status is the package’s classification, not mine. “Redesign” columns say what the recommended concept does with each capability; the full ledger with screen references is in the <a href="handoff.html#ledger">handoff</a>.</p>
+<div class="tbl"><table>
+<thead><tr><th>Capability</th><th>Status in package</th><th>Evidence</th><th>In the recommended design</th></tr></thead>
+<tbody>
+<tr><td>Browse Songs / Albums / Artists / Folders / Playlists; collection detail; play/shuffle collection</td><td><span class="tag obs">Observed</span></td><td>01, 11–16</td><td>Retained as five lenses; lens picker at large text.</td></tr>
+<tr><td>Sort by title / artist / recently added, direction toggle, persisted</td><td><span class="tag obs">Surface shown</span> <span class="tag con">Contract</span></td><td>02</td><td>Retained; sort pill in the metadata row.</td></tr>
+<tr><td>Search songs and derived collections; query-specific no-match</td><td><span class="tag obs">Observed</span></td><td>38–39</td><td>Redesigned: global, docked, typed; hidden-folder hint.</td></tr>
+<tr><td>Automatic refresh, manual Refresh / Check again / Retry; retained catalogue on failure; permission states; empty; read failure</td><td><span class="tag con">Contract</span> <span class="tag unk">NOT_RUN</span></td><td>feature-contracts.md; flows.md gaps</td><td>Designed: gate screens for first run, denied, blocked, loading, empty, read error; refresh-failed banner; Refresh in Settings.</td></tr>
+<tr><td>Mini player + Now Playing; play/pause, seek, prev/next, shuffle, repeat off/all/one; source context; artwork fallback</td><td><span class="tag obs">Observed</span> <span class="tag con">Contract</span></td><td>18, 40, 41</td><td>Redesigned: dock mini player; faces; fixed transport; unknown duration shown as a dashed, non-seekable timeline.</td></tr>
+<tr><td>Play next / Add to queue with named confirmation; occurrences; select, reorder, remove with Undo; clear with confirmation</td><td><span class="tag con">Contract</span>; surface 34–37</td><td>34–37</td><td>Redesigned: Up next face; multi-select; Undo; clear dialog mentions timer cancellation.</td></tr>
+<tr><td>Favourites; authored playlists (create, rename, delete with Undo, add/remove, drafts, blank/duplicate validation); smart collections</td><td><span class="tag obs">Observed</span> (create, add, delete) <span class="tag con">Contract</span> (validation, Undo)</td><td>03–10, 36</td><td>Retained; Favourites as a switch; authored playlists first; picker with discard guard.</td></tr>
+<tr><td>Song info with sources; MP3 tag editing (Android 11+, 300 MiB); cover keep/change/remove; validation; consent; save states; interrupted-write restore; share actual file</td><td><span class="tag obs">Surface shown</span> <span class="tag con">Contract</span></td><td>29–33</td><td>Redesigned: source sections, “from file name”, editing unavailable reason for non-MP3, changed-field marks, digit normalisation preview, six failure states, share chooser handoff.</td></tr>
+<tr><td>Sleep timer: presets, end of song, custom 1–180, +10 with 180 cap, Change draft, expiry while editing, fade, quiet finish, persistence, save-failure Retry</td><td><span class="tag obs">Observed</span> (19–27) <span class="tag con">Contract</span></td><td>19–27</td><td>Retained contract; chip with ring, mini-player glyph, “Paused by sleep timer” notice, save-failure banner.</td></tr>
+<tr><td>Notification / lock-screen / external controls in the same session</td><td><span class="tag obs">Surface shown</span></td><td>41</td><td>Retained; out of the prototype’s scope; noted in handoff.</td></tr>
+<tr><td>Settings: folder visibility, minimum duration, System/Light/Dark</td><td><span class="tag own">Owner requirement · future</span></td><td>product-brief.md</td><td>Designed in full with first-release scope.</td></tr>
+<tr><td>Lyrics</td><td><span class="tag own">Owner requirement · future</span></td><td>product-brief.md</td><td>Designed: local-first MVP (embedded USLT/SYLT, per-song .lrc/.txt import); optional expansion listed separately.</td></tr>
+<tr><td>Android Auto, widgets, Wear, casting, scrobbling, streams</td><td><span class="tag unk">Roadmap language only</span></td><td>product-brief.md; Figma pages</td><td>Not designed; not inferred.</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="questions">
+<h2>The product questions that matter most, answered provisionally</h2>
+<p>These are the decisions with the largest effect on the experience. Each is developed in the <a href="design.html#register">decision register</a> with alternatives, costs and what would change my mind.</p>
+<div class="cols">
+<div class="panel"><h4>Q1 What is the first useful screen?</h4><p>The Songs lens, with the last session in the dock. A home page needs content the product does not generate; the resume job is served by the mini player.</p></div>
+<div class="panel"><h4>Q2 Does the main experience need a navigation bar?</h4><p>No. Five lenses under one root plus a dock give every destination one tap without a second persistent band.</p></div>
+<div class="panel"><h4>Q3 Where does search live?</h4><p>In the dock, on every browsing screen, and above the keyboard when open.</p></div>
+<div class="panel"><h4>Q4 Where does the queue live?</h4><p>Inside the player as a face, never as a modal over the transport.</p></div>
+<div class="panel"><h4>Q5 Should Add be one action?</h4><p>No. Queue actions are session-scoped and reversible in seconds; playlist membership persists. They share a sheet but keep separate verbs and groups.</p></div>
+<div class="panel"><h4>Q6 Favourites versus playlists?</h4><p>Favourites is a switch, not a playlist row, so it cannot be confused with a destination that has membership counts.</p></div>
+<div class="panel"><h4>Q7 Where does Settings live and what is immediate?</h4><p>A gear on the library header. Every setting applies immediately with Undo; the number each option hides is shown before choosing. No Apply/Discard draft.</p></div>
+<div class="panel"><h4>Q8 How are hidden songs explained?</h4><p>One amber pill wherever counts change, one sheet that lists the reasons, one tap to show a folder again. Hidden songs remain in playlists and the queue and are listed under an expandable footer.</p></div>
+<div class="panel"><h4>Q9 What is Lyrics in v1?</h4><p>Lyrics embedded in the file (synced or plain) and a per-song lyrics file the person chooses. No online source, no matching, no permissions beyond audio access.</p></div>
+<div class="panel"><h4>Q10 What can a static mockup not tell us?</h4><p>Whether faces are discovered, whether the dock’s blur is affordable, whether TalkBack order is right. Each is in the <a href="validation.html">validation plan</a>.</p></div>
+</div>
+</section>
+
+<section id="open">
+<h2>Open questions, conflicts and assumptions</h2>
+<h3>Conflicts between sources</h3>
+<ul class="tight">
+<li><b>Unknown duration.</b> Round 2 kept unknown-duration tracks as a fixed rule <span class="tag pro">Proposal</span>; the brief says this is not approved <span class="tag own">Owner</span>. Resolved as a default (kept) with a switch, and unknown duration is never treated as zero <span class="tag con">Contract</span>.</li>
+<li><b>What folder hiding preserves.</b> The owner invariant preserves files, authored playlists and the queue; Round 2 additionally preserved favourites and history <span class="tag pro">Proposal</span>. This design preserves favourites and history too and marks it as requiring an owner decision (D7).</li>
+<li><b>Timer placement.</b> The current app has three placements; Round 2 has one bottom action; Figma has none. This design uses one chip in the player and one glyph in the mini player.</li>
+<li><b>Palette.</b> Figma base frames are pale green; Rounds 1–2 use blue. Neither is mandated. This design uses a lapis blue accent for controls and derives the player tint from artwork, with the blue as fallback.</li>
+</ul>
+<h3>Assumptions made to proceed</h3>
+<ul class="tight">
+<li>A1 The 825-song count already reflects the shipped 30 s filter (flows.md reports 825 as the baseline of the installed build).</li>
+<li>A2 Folder names in the library come from Android’s media index and are limited to folders containing audio.</li>
+<li>A3 The shared design system can render blur on a single dock surface; a solid variant exists.</li>
+<li>A4 Persian is the second locale; Arabic-Indic digit input applies to timer and numeric tag fields <span class="tag con">Contract</span>.</li>
+<li>A5 The media session (notification, lock screen, Bluetooth) is unchanged by this redesign.</li>
+</ul>
+<h3>Questions only the owner can answer</h3>
+<ul class="tight">
+<li>Whether hidden songs may be played from a playlist footer (this design says yes, because membership is preserved; it could be view-only).</li>
+<li>Whether “Save queue as playlist” is wanted (new capability).</li>
+<li>Whether the Lyrics face may ship visible with an honest empty state before lyrics exist, or should stay behind a flag.</li>
+<li>Whether the app name in the header should read “Daria” or “Daria Music” (the captures use “Daria Music”; the mark here uses the note glyph plus “Daria” for width).</li>
+</ul>
+</section>
+
+<footer class="site">Part 1 of the Daria redesign dossier. Next: <a href="concepts.html">Three concepts</a>.</footer>
+</main>
+<script src="assets/icons.js"></script><script src="assets/kit.js"></script><script src="assets/doc.js"></script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Daria Dock Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/doc.css">
+<link rel="stylesheet" href="assets/kit.css">
+<style>
+.proto{display:grid;grid-template-columns:260px auto minmax(240px,1fr);gap:26px;align-items:start;padding-block:22px 40px}
+.ctl{display:flex;flex-direction:column;gap:14px;position:sticky;top:76px}
+.ctl fieldset{border:1px solid var(--rule);border-radius:14px;padding:10px 12px 12px;margin:0;background:var(--card)}
+.ctl legend{font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink3);padding:0 4px}
+.ctl .opts{display:flex;flex-wrap:wrap;gap:6px}
+.ctl button{font:500 13.5px/1.2 "IBM Plex Sans",system-ui,sans-serif;border:1px solid var(--rule);background:var(--paper);color:var(--ink);border-radius:9px;padding:7px 10px;cursor:pointer;text-align:start}
+.ctl button[aria-pressed="true"]{background:var(--lapis);color:#fff;border-color:var(--lapis)}
+:root[data-theme="dark"] .ctl button[aria-pressed="true"]{color:#0d1a42}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ctl button[aria-pressed="true"]{color:#0d1a42}}
+.ctl button.wide{width:100%}
+.stage{display:flex;justify-content:center;padding:12px 4px;overflow-x:auto;max-width:100%}
+.anno{position:sticky;top:76px;display:flex;flex-direction:column;gap:14px}
+.anno .panel{padding:14px 16px}
+.anno .sid{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink3)}
+.anno h3{margin:2px 0 6px;font-size:18px}
+.tasks{list-style:none;padding:0;margin:6px 0 0;display:flex;flex-direction:column;gap:6px}
+.tasks button{width:100%}
+.tasks small{display:block;color:var(--ink3)}
+#task-hint{display:none}
+#task-hint.on{display:block}
+@media (max-width:1080px){.proto{grid-template-columns:1fr}.ctl,.anno{position:static}.stage{order:-1}}
+</style>
+</head>
+<body>
+<nav class="topnav" id="topnav"></nav>
+<main class="wrap">
+  <header class="hero" style="padding-bottom:0">
+    <div class="kicker">Recommended concept · Interactive prototype</div>
+    <h1>Dock prototype</h1>
+    <p class="lede">One library with a thumb-reach dock for search and playback. Everything here is a browser simulation. No audio plays, no file is read or written, and Android dialogs are imitations marked in red.</p>
+    <div class="legend"><span><span class="tag obs">Redesigned</span> current capability, new presentation</span><span><span class="tag fut">Future</span> owner-requested, not shipped</span><span><span class="tag pro">Proposal</span> new behaviour needing owner approval</span><span><span class="tag sim">Simulated</span> Android system UI or timing</span></div>
+  </header>
+  <div class="proto">
+    <aside class="ctl" aria-label="Scenario controls">
+      <fieldset><legend>Display</legend>
+        <div class="opts" data-group="lang"><button data-set="lang" data-v="en" aria-pressed="true">English</button><button data-set="lang" data-v="fa">فارسی (RTL)</button></div>
+        <div class="opts" data-group="theme" style="margin-top:6px"><button data-set="theme" data-v="light" aria-pressed="true">Light</button><button data-set="theme" data-v="dark">Dark</button></div>
+        <div class="opts" data-group="scale" style="margin-top:6px"><button data-set="scale" data-v="1" aria-pressed="true">Text 100%</button><button data-set="scale" data-v="1.3">130%</button><button data-set="scale" data-v="1.6">160%</button></div>
+        <div class="opts" data-group="w" style="margin-top:6px"><button data-set="w" data-v="390" aria-pressed="true">390 × 844</button><button data-set="w" data-v="320">320 × 640</button></div>
+        <div class="opts" style="margin-top:6px"><button data-tog="rm" aria-pressed="false">Reduced motion</button><button data-tog="solid" aria-pressed="false">No blur</button></div>
+      </fieldset>
+      <fieldset><legend>Start from</legend>
+        <div class="opts">
+          <button class="wide" data-start="everyday">Everyday: paused song, 825-song library</button>
+          <button class="wide" data-start="first">First launch, access not granted</button>
+          <button class="wide" data-start="empty">Access granted, no music found</button>
+          <button class="wide" data-start="readError">Library couldn’t be read</button>
+          <button class="wide" data-start="refreshFailed">Update failed, older library kept</button>
+          <button class="wide" data-start="hidden">Quick Share folder hidden</button>
+          <button class="wide" data-start="timer">Sleep timer running, 1 min left</button>
+        </div>
+      </fieldset>
+      <fieldset><legend>Simulate</legend>
+        <div class="opts">
+          <button class="wide" data-sim="back">Android Back</button>
+          <button class="wide" data-sim="skip">Advance clock 5 minutes</button>
+          <button class="wide" data-sim="missing">Delete “Kaftare Kacol Besar” file</button>
+          <button class="wide" data-sim="tmfail">Next timer change fails to save</button>
+          <button class="wide" data-sim="ext">Tag save: file changed outside Daria</button>
+          <button class="wide" data-sim="write">Tag save: write interrupted</button>
+          <button class="wide" data-sim="space">Tag save: not enough space</button>
+          <button class="wide" data-sim="observe">Automatic updates unavailable</button>
+        </div>
+      </fieldset>
+    </aside>
+    <div class="stage" id="stage" aria-label="Prototype phone"></div>
+    <aside class="anno" aria-label="Annotations">
+      <div class="panel" aria-live="polite"><div class="sid" id="a-id">S01</div><h3 id="a-name">Library</h3><div id="a-status"></div><p id="a-note" style="font-size:14px;color:var(--ink2);margin-bottom:0"></p></div>
+      <div class="panel" id="task-hint"><b>Current task</b><p id="task-text" style="font-size:14px;margin:4px 0 0"></p></div>
+      <div class="panel"><b>Shared tasks</b><p style="font-size:13.5px;color:var(--ink3);margin:2px 0 6px">The same tasks drive every concept’s walkthrough. Choose one to reset the prototype to its start.</p>
+        <ul class="tasks" id="tasks"></ul></div>
+    </aside>
+  </div>
+</main>
+<footer class="site wrap">Prototype engine: <code>assets/proto.js</code>. Content from current-app captures 01–41; covers are generated placeholders; lyrics are illustrative text written for this prototype.</footer>
+<script src="assets/icons.js"></script>
+<script src="assets/kit.js"></script>
+<script src="assets/proto.js"></script>
+<script src="assets/doc.js"></script>
+<script>
+(function(){
+const NOTES = {
+  S01:['Library · Songs','redesigned','One library, five lenses. Search and playback live in the dock at the bottom. The amber “hidden” pill appears only when settings hide songs.'],
+  S02:['Library · Playlists','redesigned','Your playlists come first; automatic collections are compact tiles below. New playlist is a visible button, not a tile.'],
+  S03:['Library · Albums','redesigned','Albums stay a cover grid. Missing covers use the Daria tile, never a letter or digit.'],
+  S04:['Library · Artists','retained','Artist list with generated tiles instead of initials.'],
+  S05:['Library · Folders','redesigned','Folders can be hidden right here. Hidden folders collect in their own section with a Show button.'],
+  S06:['Collection detail','redesigned','Album, artist, folder or automatic collection. Play and Shuffle first; the ⋮ menu adds queue actions and, for folders, Hide.'],
+  S07:['Playlist detail','redesigned','Songs from hidden folders stay in the playlist and are counted in a footer row you can expand.'],
+  S08:['Add songs to playlist','retained','Selection is a draft until “Add n songs”. Leaving with a selection asks before discarding.'],
+  S09:['Search','redesigned','Global search across songs, albums, artists, playlists and folders. The field stays at the bottom, above the keyboard.'],
+  S10:['Now Playing · Cover','redesigned','Transport never moves. Cover, Lyrics and Up next are three views of the same player.'],
+  S11:['Now Playing · Lyrics','future','Lyrics are a future feature. The first release reads lyrics stored inside the song file and lets you add a lyrics file per song.'],
+  S12:['Now Playing · Up next','redesigned','The queue opens inside the player, so play, pause and seek stay reachable while reordering.'],
+  S13:['Track actions','redesigned','Grouped by consequence: this listening session, keep, go to, file. Favourite is the heart in the header.'],
+  S14:['Add to playlist','redesigned','Favourites is a switch; playlists add immediately with Undo. Playlists already containing the song say so.'],
+  S15:['Sleep timer','redesigned','Same contract as today’s timer: presets start at once, custom needs Start, Change keeps the old timer until Apply.'],
+  S16:['Song info','redesigned','Shows where each value comes from and why editing is unavailable for non-MP3 files.'],
+  S17:['Tag editor','redesigned','Writes the actual file. The bottom panel says so before Save; Android consent is simulated.'],
+  S19:['Settings','future','Settings is owner-requested and not shipped. Library rules, appearance and a later lyrics folder.'],
+  S20:['Settings · Folders','future','Switches apply at once with Undo. New folders are shown by default.'],
+  S21:['Settings · Minimum length','future','Each option shows how many songs it would hide before you choose it. Unknown length is kept by default.'],
+  S22:['Hidden songs explainer','proposal','Explains exactly what is hidden and offers one-tap recovery.'],
+};
+const STATUS = {redesigned:'<span class="tag obs">Redesigned</span>', retained:'<span class="tag obs">Retained</span>', future:'<span class="tag fut">Future · not shipped</span>', proposal:'<span class="tag pro">Proposal</span>'};
+const TASKS = [
+  ['T1','First launch to first song','Grant access (try “Don’t allow” twice to reach the blocked state), then play any song.','first'],
+  ['T2','Find and play “Benevis”','Use the search field in the dock. Try searching “Mahasti”.','everyday'],
+  ['T3','Queue two songs, then reorder','From a row’s ⋮ menu choose Play next and Add to queue, then open the player’s Up next view.','everyday'],
+  ['T4','Save the playing song to a new playlist','Open the player and choose Add to playlist › New playlist. Try a blank or duplicate name.','everyday'],
+  ['T5','Pause after this song, then change it','Open the player, tap Sleep timer, choose End of this song, then Change time.','everyday'],
+  ['T6','Hide the Quick Share folder, then recover','Folders lens › ⋮ › Hide from library. Then search “Benevis” and follow the hidden-folder hint.','everyday'],
+  ['T7','Fix an artist tag and share the file','Open Benevis › ⋮ › Song info › Edit tags. Change the artist to “Mahasti”, save, then Share file.','everyday'],
+  ['R1','Recover from a missing file','Tap “Delete … file” under Simulate, then play Kaftare Kacol Besar.','everyday'],
+];
+const stage = document.getElementById('stage');
+let disp = {lang:'en',theme:'light',scale:1,w:390,rm:false,solid:false};
+let app = null;
+function start(kind){
+  app && app.stop();
+  const st = DK.App.init(Object.assign({}, disp, {h: disp.w==320?640:844}));
+  if (kind==='first'){ st.perm='first'; st.pb.session=false; }
+  if (kind==='empty'){ st.lib='empty'; st.pb.session=false; }
+  if (kind==='readError'){ st.lib='readError'; st.pb.session=false; }
+  if (kind==='refreshFailed'){ st.refreshFailed=true; }
+  if (kind==='hidden'){ st.hidden.add('QuickShare'); }
+  if (kind==='timer'){ st.pb.playing=true; st.tm.mode='dur'; st.tm.end=st.clock+65000; st.tm.total=1800; st.np={face:'cover'}; }
+  app = DK.App.mount(stage, st, {onRender: anno});
+}
+function anno(st){
+  const id = st.meta2 || (st.meta && st.meta.id) || 'S01';
+  const n = NOTES[id] || [st.meta?st.meta.name:'', st.meta?st.meta.status:'redesigned', ''];
+  document.getElementById('a-id').textContent = id + (st.sys? ' · Android UI simulated':'');
+  document.getElementById('a-name').textContent = n[0];
+  document.getElementById('a-status').innerHTML = STATUS[n[1]] + (st.sys?' <span class="tag sim">Simulated system UI</span>':'');
+  document.getElementById('a-note').textContent = n[2];
+}
+document.querySelectorAll('[data-set]').forEach(b=>b.addEventListener('click',()=>{
+  const k=b.dataset.set, v=b.dataset.v; disp[k] = (k==='scale'||k==='w')? +v : v;
+  b.parentElement.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed', x===b));
+  if (app){ Object.assign(app.st, {lang:disp.lang, theme:disp.theme, scale:disp.scale, w:disp.w, h: disp.w==320?640:844}); app.draw(); }
+}));
+document.querySelectorAll('[data-tog]').forEach(b=>b.addEventListener('click',()=>{ const k=b.dataset.tog; disp[k]=!disp[k]; b.setAttribute('aria-pressed',disp[k]); app.st[k]=disp[k]; app.draw(); }));
+document.querySelectorAll('[data-start]').forEach(b=>b.addEventListener('click',()=>{ document.getElementById('task-hint').classList.remove('on'); start(b.dataset.start); }));
+document.querySelectorAll('[data-sim]').forEach(b=>b.addEventListener('click',()=>{
+  const st=app.st, k=b.dataset.sim;
+  if (k==='back') return app.back();
+  if (k==='skip') return app.tick(300);
+  if (k==='missing'){ st.missing.add('kaftare'); st.snack={text:'Simulated: the file was deleted outside Daria', t:Date.now()}; }
+  if (k==='tmfail'){ st.scen.timerSaveFail=true; st.snack={text:'Simulated: the next timer change will fail to save', t:Date.now()}; }
+  if (k==='ext'||k==='write'||k==='space'){ st.scen.editFail=k; st.snack={text:'Simulated: the next tag save will fail ('+k+')', t:Date.now()}; }
+  if (k==='observe'){ st.observeOff=true; st.snack={text:'Simulated: automatic updates unavailable. See Settings › Refresh library', t:Date.now()}; }
+  app.draw();
+}));
+const tl = document.getElementById('tasks');
+tl.innerHTML = TASKS.map(t=>`<li><button data-task="${t[0]}"><b>${t[0]}</b> ${t[1]}<small>${t[2]}</small></button></li>`).join('');
+tl.addEventListener('click',e=>{ const b=e.target.closest('[data-task]'); if(!b) return; const t=TASKS.find(x=>x[0]===b.dataset.task); start(t[3]); document.getElementById('task-text').textContent=t[1]+'. '+t[2]; document.getElementById('task-hint').classList.add('on'); });
+start('everyday');
+})();
+</script>
+</body>
+</html>

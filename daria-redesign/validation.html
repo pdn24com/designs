@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Daria Validation Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/doc.css">
+</head>
+<body>
+<nav class="topnav" id="topnav"></nav>
+<main class="wrap">
+<header class="hero">
+  <div class="kicker">Part 5 · Validation plan</div>
+  <h1>What to test before believing this design</h1>
+  <p class="lede">A plan, not results. Nothing here has been run with participants. Tasks are ordered by the risk they retire; each names the observation that counts as success or failure so the outcome cannot be argued after the fact.</p>
+  <div class="toc"><a href="#participants">Participants</a><a href="#tasks">Prioritised tasks</a><a href="#experiments">Experiments and hypotheses</a><a href="#technical">Technical checks</a><a href="#risks">Remaining risks</a></div>
+</header>
+
+<section id="participants">
+<h2>Representative participant needs</h2>
+<div class="tbl"><table>
+<thead><tr><th>Profile</th><th>Why they matter</th><th>Count</th></tr></thead>
+<tbody>
+<tr><td>Persian-first, mixed Persian/Latin library, RTL system locale</td><td>Bidi metadata, Persian digits, mirrored dock and lens row.</td><td>3</td></tr>
+<tr><td>English-first, large messy library (500+ files, most without embedded art or tags)</td><td>File-derived titles, tiles instead of art, search under noise.</td><td>3</td></tr>
+<tr><td>Small library (under 50 files), new install</td><td>First run, permission gate, empty and thin states.</td><td>2</td></tr>
+<tr><td>Large text (≥ 150%) or TalkBack user</td><td>Lens picker, wrapping rows, face tabs, slider semantics, gesture alternatives.</td><td>2 (at least one TalkBack)</td></tr>
+<tr><td>Nightly sleep-timer user</td><td>Timer chip, change and expiry notices, one-handed use in the dark.</td><td>2</td></tr>
+<tr><td>Small phone (≤ 5.5 inch) or landscape-in-car user</td><td>320-dp layouts, landscape player.</td><td>1–2</td></tr>
+</tbody></table></div>
+<p>Sessions on the participant’s own phone with their own library where possible; the prototype runs in a mobile browser at device width. Moderated, 45 minutes, think-aloud.</p>
+</section>
+
+<section id="tasks">
+<h2>Prioritised tasks with success and failure observations</h2>
+<div class="tbl"><table>
+<thead><tr><th>#</th><th>Task (as given to the participant)</th><th>Risk retired</th><th>Success observation</th><th>Failure observation</th></tr></thead>
+<tbody>
+<tr><td>V1</td><td>“Find the song called Benevis and start it.”</td><td>Docked search is discovered (D1).</td><td>Taps the dock field within 10 s without prompting; starts the song from results.</td><td>Looks for search in the header for more than 10 s, or scrolls the list instead.</td></tr>
+<tr><td>V2</td><td>“Make these two songs play right after the current one, then put the second one first.”</td><td>Queue face is found; verbs are distinct (D3, D4).</td><td>Uses Play next / Add to queue correctly; opens the player and finds Up next; reorders with handle or menu; transport visibly still available.</td><td>Cannot find the queue in 30 s; uses Add to playlist for a queue task; closes the player to find the queue.</td></tr>
+<tr><td>V3</td><td>“Stop the music after this song finishes, then change your mind and make it stop in 45 minutes instead.”</td><td>Timer chip states and Change draft are understood (D9, D10).</td><td>Reads “After this song” correctly; uses Change time; states that the old timer was still running until Apply.</td><td>Cancels and restarts instead of changing; believes the timer changed before Apply; misreads the chip.</td></tr>
+<tr><td>V4</td><td>“Hide the Quick Share folder from your library. Then find Benevis again.”</td><td>Hidden-content explanation is understood; recovery is found (D6, D7).</td><td>Explains unprompted that files were not deleted; uses the search hint or the pill to show the folder again.</td><td>Believes songs were deleted; cannot find how to show the folder; asks whether playlists lost songs.</td></tr>
+<tr><td>V5</td><td>“Correct the artist name on this song and send the file to a friend.”</td><td>Editor consequences and states are clear (D11); Share is understood as the actual file.</td><td>Reads the file-write statement before saving; understands the consent dialog; picks Share file without expecting a link.</td><td>Surprised by the consent dialog; expects the change to be app-only; expects a link or a cover image to be shared.</td></tr>
+<tr><td>V6</td><td>“Save the song that is playing into a new list called Night drive.”</td><td>Favourites vs playlists (D5); blank/duplicate handling.</td><td>Uses Add to playlist › New; does not toggle Favourites by mistake.</td><td>Toggles Favourites believing it is a list; cannot find New playlist.</td></tr>
+<tr><td>V7</td><td>First run: “Set the app up and play anything.”</td><td>Gate copy and recovery (denied, blocked).</td><td>Grants access after reading the gate; if denied twice, follows Open app settings.</td><td>Denies because the gate reads as an upload consent; stuck on the blocked state.</td></tr>
+<tr><td>V8</td><td>TalkBack: V1 and V2 with the screen off.</td><td>Names, order, gesture alternatives.</td><td>Completes both with linear navigation; every stop is meaningful; slider announces position.</td><td>Any unlabelled control; needs a swipe to switch faces; cannot reorder.</td></tr>
+<tr><td>V9</td><td>Large text 160%: V1 and V4 on a 320-dp phone.</td><td>Picker, wrapping rows, single-row dock.</td><td>All labels readable; nothing clipped; lens picker understood.</td><td>Any clipped label; row content hidden under the dock.</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="experiments">
+<h2>Experiments and hypotheses</h2>
+<div class="cols">
+<div class="panel"><h4>E1 · Faces vs chips</h4><p><b>Hypothesis:</b> a tabbed Up next face is found as quickly as a labelled “Queue” chip and is preferred for reordering because the transport stays visible. <b>Measure:</b> time to first queue interaction in V2 between two prototype variants; preference after both. <b>Decision rule:</b> if the chip variant is found more than 5 s faster on average, add a Queue chip on the Cover face that switches faces.</p></div>
+<div class="panel"><h4>E2 · Resume card</h4><p><b>Hypothesis:</b> repeat listeners do not miss a home page because the mini player carries the last session. <b>Measure:</b> in a diary-style follow-up, what participants do in the first 10 s of opening the app. <b>Decision rule:</b> if more than half start by opening the player or the Recently played tile, promote a resume card to the top of Songs (no architecture change).</p></div>
+<div class="panel"><h4>E3 · Stage mode</h4><p><b>Hypothesis:</b> a persistent player with a library sheet (Concept C3) is preferred for casual listening but rejected for library work. <b>Measure:</b> V1, V2 and V4 in Stage vs Dock; preference by library size. <b>Decision rule:</b> if Stage wins on preference for small libraries without losing V4, offer it as an optional player layout.</p></div>
+<div class="panel"><h4>E4 · Immediate settings vs draft</h4><p><b>Hypothesis:</b> immediate switches with Undo produce fewer errors and less hesitation than Apply/Discard for folder hiding. <b>Measure:</b> hesitation before toggling; unintended hides; recovery time. <b>Decision rule:</b> if unintended hides are not recovered within 10 s by most participants, add a confirmation for folders over 100 songs.</p></div>
+<div class="panel"><h4>E5 · Lyrics face before lyrics exist</h4><p><b>Hypothesis:</b> the empty Lyrics face with its explanation reads as “this song has no lyrics”, not “the app is broken”. <b>Measure:</b> think-aloud on first opening the face. <b>Decision rule:</b> any participant calling it broken means the face ships behind a flag until lyrics exist.</p></div>
+<div class="panel"><h4>E6 · Daria tile</h4><p><b>Hypothesis:</b> generated tiles are not mistaken for real artwork and make grids of missing-art albums scannable. <b>Measure:</b> ask which albums have real covers; time to find a named album in the Albums grid. <b>Decision rule:</b> if tiles are mistaken for art, add the note glyph at all sizes and a “no cover” line in Song info (already present).</p></div>
+</div>
+</section>
+
+<section id="technical">
+<h2>Technical checks (engineering, not participants)</h2>
+<ul class="tight">
+<li>Dock blur cost on the lowest-end supported device; frame time while scrolling Songs with the mini player playing. Decision rule: solid dock by default on devices that drop frames.</li>
+<li>Tint extraction per cover ≤ 20 ms on a background thread with a cache keyed by file identity.</li>
+<li>Folder-hide recount time for 825 and 5,000 tracks; decision rule for the draft fallback is 300 ms.</li>
+<li>Contrast of text on the ten tints in light and dark, plus the fallback, in an automated check.</li>
+<li>Landscape player on the phone that reported clipping.</li>
+<li>Timer expiry, +10 cap, change-while-running, expiry-while-editing, save-failure Retry, reboot discard, and end-of-song retargeting through an external controller, on device. These are contract checks the redesign must not regress.</li>
+<li>Editor: consent denial, external change, interrupted write with restore, low space, second save while busy, on an MP3 corpus that includes Persian tags and ID3v2.3/2.4 mixes.</li>
+</ul>
+</section>
+
+<section id="risks">
+<h2>Remaining risks and unknowns</h2>
+<div class="tbl"><table>
+<thead><tr><th>Risk</th><th>Likelihood</th><th>Effect</th><th>Mitigation in the design</th></tr></thead>
+<tbody>
+<tr><td>Up next face not discovered</td><td>Medium</td><td>Queue editing feels missing</td><td>E1; one-line fix (chip).</td></tr>
+<tr><td>Dock blur too costly on low-end devices</td><td>Medium</td><td>Scroll jank</td><td>Solid fallback specified; check in technical validation.</td></tr>
+<tr><td>Owners want a Home page after all</td><td>Low–medium</td><td>Architecture question reopened</td><td>Rooms concept kept; a resume card fits under Songs without a nav bar.</td></tr>
+<tr><td>Hidden songs playable from playlists confuses people</td><td>Low</td><td>“Why can I play what I hid?”</td><td>Footer copy; owner decision D7 can make it view-only.</td></tr>
+<tr><td>Persian copy quality</td><td>High (untested)</td><td>Trust</td><td>All strings are drafts for native review.</td></tr>
+<tr><td>TalkBack order on the player</td><td>Medium</td><td>Accessibility acceptance</td><td>Order specified; V8.</td></tr>
+<tr><td>Generated tiles look samey in large grids</td><td>Medium</td><td>Scannability</td><td>Six hues × five patterns; E6.</td></tr>
+<tr><td>Prototype fidelity gap (browser vs Android)</td><td>Certain</td><td>Timing, gestures, system dialogs differ</td><td>All simulations labelled; contract checks listed above are on device.</td></tr>
+</tbody></table></div>
+</section>
+<footer class="site">Part 5 of the Daria redesign dossier. Back to the <a href="index.html">owner summary</a>.</footer>
+</main>
+<script src="assets/doc.js"></script>
+</body>
+</html>

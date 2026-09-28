@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Daria Concepts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/doc.css">
+<link rel="stylesheet" href="assets/kit.css">
+</head>
+<body>
+<nav class="topnav" id="topnav"></nav>
+<main class="wrap">
+<header class="hero">
+  <div class="kicker">Part 2 · Three product concepts</div>
+  <h1>Rooms, Dock, Stage</h1>
+  <p class="lede">Three different answers to the same question: how should a local-file player organise finding, playing and keeping music? Each concept keeps every documented capability and is rendered with the same content, the same 390×844 frame and the same seven tasks.</p>
+  <div class="meta"><span>Content: Hormoz library, 28 Sep 2026 captures</span><span>Mockups: static HTML from the shared kit; covers are placeholders</span><span>Ratings: comparative judgement, not measured outcomes</span></div>
+  <div class="toc"><a href="#criteria">Criteria</a><a href="#c1">C1 Rooms</a><a href="#c2">C2 Dock</a><a href="#c3">C3 Stage</a><a href="#tasks">Task walkthroughs</a><a href="#compare">Comparison</a><a href="#recommend">Recommendation</a><a href="#references">Head-to-head with references</a></div>
+</header>
+
+<section id="criteria">
+<h2>Evaluation criteria and weights</h2>
+<p>Weights follow the product brief: Daria is a local player used repeatedly, often one-handed, in English and Persian, on small and large phones. Findability and listening continuity carry the most weight because every job in the brief starts with finding something already on the phone and ends with uninterrupted playback. Delight is weighted below task clarity on purpose: the brief asks for an identity that earns its cost.</p>
+<div class="tbl"><table>
+<thead><tr><th>Criterion</th><th class="num">Weight</th><th>What it means here</th><th>Evidence it draws on</th></tr></thead>
+<tbody>
+<tr><td><b>Findability</b></td><td class="num">20</td><td>Can a person reach any song, collection, playlist or folder in a large library, including by search, from wherever they are?</td><td>825 songs, 279 artists, four folders <span class="ev">flows.md baseline</span>; search only reachable from the library header today <span class="ev">01, 38</span></td></tr>
+<tr><td><b>Task clarity</b></td><td class="num">15</td><td>Do actions mean one thing? Is queue vs playlist vs file operation unmistakable?</td><td>Two differently ordered action sheets <span class="ev">28, 37</span>; timer draft vs active <span class="ev">21–23</span>; editor writes the file <span class="ev">32</span></td></tr>
+<tr><td><b>Listening continuity</b></td><td class="num">15</td><td>Playback controls stay reachable while browsing, managing the queue or editing.</td><td>Persistent mini player today <span class="ev">01–16</span>; queue is a sheet over the player <span class="ev">34</span></td></tr>
+<tr><td><b>Reachability</b></td><td class="num">12</td><td>Frequent controls within thumb reach on a 6.7-inch phone; no gesture-only paths.</td><td>Search and settings in the top corners today; category chips at the top <span class="ev">01</span></td></tr>
+<tr><td><b>Information density</b></td><td class="num">8</td><td>Rows per screen and metadata legibility with long mixed-script names.</td><td>Long file-derived titles truncated <span class="ev">01, 14, 34</span>; 1.8× text study <span class="ev">round-2 large-dark-320</span></td></tr>
+<tr><td><b>Accessibility</b></td><td class="num">10</td><td>Large text, RTL, screen-reader order, visible alternatives to gestures, reduced motion.</td><td>Untested today <span class="ev">flows.md coverage gaps</span>; owner requirement <span class="ev">product-brief.md</span></td></tr>
+<tr><td><b>Brand character</b></td><td class="num">8</td><td>Feels like Daria, not a template; identity concentrated where it helps.</td><td>Owner values expressive identity <span class="ev">product-brief.md</span>; blue vs pale green treatments in references</td></tr>
+<tr><td><b>Delight</b></td><td class="num">6</td><td>Moments that reward repeated use without adding friction.</td><td>Hypothesis only</td></tr>
+<tr><td><b>Feasibility</b></td><td class="num">6</td><td>Fits the existing shared design system and Android media session; risk of new gesture or rendering work.</td><td>Landscape clipping already reported <span class="ev">feature-contracts.md</span></td></tr>
+</tbody></table></div>
+<p><small>Scores below are 1–5 comparative judgements by the designer. They are not user data. The weighted totals are used to rank, not to prove.</small></p>
+</section>
+
+<!-- =============== C1 =============== -->
+<section class="concept" id="c1" style="--c:#0E6B64">
+<div class="cname"><h2>C1 · Rooms</h2><span class="pr">Organising principle: <b>three rooms for three moods</b>. Listen (resume and revisit), Library (find deliberately), Search (find by name).</span></div>
+<p>Rooms takes the strongest idea from the Figma reference and the Sessions study seriously: people who open a music app often want to <em>continue</em>, not browse. It gives that job its own destination with a resume card and personal shortcuts, keeps the full library as a second room, and makes global search a third. A mini player sits above the navigation bar. Now Playing is a full-screen sheet; Queue is a modal sheet on top of it.</p>
+<div class="cols two">
+<div class="ia"><h4 style="margin:0 0 8px">Product / IA map</h4>
+<svg viewBox="0 0 700 250" role="img" aria-label="Rooms IA map: bottom navigation with Listen, Library and Search; mini player above; Now Playing sheet with queue, timer, lyrics and playlist sheets; Settings from Listen header">
+<rect class="hub" x="20" y="20" width="200" height="56" rx="10"/><text x="120" y="42" text-anchor="middle" font-weight="700">Listen (home)</text><text class="sub" x="120" y="60" text-anchor="middle">Resume · Recently played · Shortcuts</text>
+<rect class="hub" x="250" y="20" width="200" height="56" rx="10"/><text x="350" y="42" text-anchor="middle" font-weight="700">Library</text><text class="sub" x="350" y="60" text-anchor="middle">Songs · Albums · Artists · Folders · Playlists</text>
+<rect class="hub" x="480" y="20" width="200" height="56" rx="10"/><text x="580" y="42" text-anchor="middle" font-weight="700">Search</text><text class="sub" x="580" y="60" text-anchor="middle">All types · recent searches</text>
+<rect class="box" x="250" y="100" width="200" height="40" rx="8"/><text x="350" y="125" text-anchor="middle">Collection / Playlist detail</text>
+<path class="ln" d="M350 76v24"/>
+<rect class="fut" x="20" y="100" width="200" height="40" rx="8"/><text x="120" y="125" text-anchor="middle">Settings (future)</text><path class="ln" d="M120 76v24"/>
+<rect class="box" x="120" y="170" width="460" height="40" rx="8"/><text x="350" y="195" text-anchor="middle" font-weight="700">Mini player above nav → Now Playing sheet</text>
+<path class="lnd" d="M120 140v30M350 140v30M580 76v94"/>
+<text class="sub" x="350" y="240" text-anchor="middle">Now Playing opens: Queue sheet · Lyrics (future) · Sleep timer · Add to playlist · overflow (info, share, go to)</text>
+</svg></div>
+<div class="panel"><h4>Essential interaction rules</h4><ul class="tight">
+<li>Bottom bar: single selection, always visible except inside Now Playing and editors. Re-tapping the current room scrolls to top.</li>
+<li>Listen shows a resume card only when a session exists; with no history it shows shortcuts and “Recently added”. Nothing is generated or recommended.</li>
+<li>Mini player: tap anywhere opens Now Playing; play/pause and next are direct.</li>
+<li>Back inside Now Playing returns to the room that opened it; Back on a room returns to Listen; Back on Listen leaves the app.</li>
+<li>Queue is a modal sheet (32% scrim, drag handles). Transport is hidden under it; the sheet must close to seek.</li>
+<li>Settings lives behind the gear on Listen. It also carries a “Listen page” toggle to hide history, because the history room is a preference some people will not want.</li>
+</ul></div>
+</div>
+<div id="g-c1"></div>
+<div class="pc">
+<div><h4>Strongest advantages</h4><ul class="tight"><li>Resume and revisit are one tap from launch; this is the largest reduction in taps for repeat listening of the three.</li><li>Global search is a first-class destination with its own recents, which the current app lacks.</li><li>Familiar three-tab model; lowest learning cost; fits the Figma annotations and the design system.</li></ul></div>
+<div><h4>Actual compromises</h4><ul class="tight"><li>Two persistent bands (mini player + nav) consume about 130 px on every browsing screen; at 160% text the list shows five rows on a 320 px phone.</li><li>Listen must be filled with content from a personal library. With a small or new library it is thin; with a huge library it repeats what the smart collections already offer.</li><li>Queue as a modal sheet hides the transport, which is the same limitation the current app has <span class="ev">34</span>.</li><li>Settings is reachable only from one room, which is one more thing to remember.</li></ul></div>
+<div><h4>Greatest uncertainty</h4><p>Whether a home room earns its place in an offline library app. The Sessions study asked the same question and nothing in the package answers it. This is the concept to test if the owner believes “continue listening” is the dominant job.</p></div>
+</div>
+</section>
+
+<!-- =============== C2 =============== -->
+<section class="concept" id="c2" style="--c:#2E4E9E">
+<div class="cname"><h2>C2 · Dock</h2><span class="pr">Organising principle: <b>one library, one dock</b>. Everything you browse is above; everything you touch most is in a dock at your thumb.</span></div>
+<p>Dock removes the top-level navigation question by having a single library with five lenses, and moves the two most frequent global actions, search and playback, into a dock at the bottom of every browsing screen. Now Playing is a full-screen surface with three <em>faces</em> (Cover, Lyrics, Up next) that share one fixed transport, so the queue is never a modal that hides play/pause. Settings is a gear on the library header and is the only place library rules live, but every place the rules bite (counts, playlists, search) shows a pill or footer that explains and links back.</p>
+<div class="cols two">
+<div class="ia"><h4 style="margin:0 0 8px">Product / IA map</h4>
+<svg viewBox="0 0 700 270" role="img" aria-label="Dock IA map: one Library with five lenses; dock with mini player and search on every browsing screen; Now Playing with Cover, Lyrics and Up next faces sharing one transport; Settings from the library header">
+<rect class="hub" x="150" y="16" width="400" height="60" rx="10"/><text x="350" y="40" text-anchor="middle" font-weight="700">Library (single root)</text><text class="sub" x="350" y="60" text-anchor="middle">Lenses: Songs · Playlists · Albums · Artists · Folders  ·  amber “n hidden” pill when rules apply</text>
+<rect class="box" x="60" y="106" width="200" height="40" rx="8"/><text x="160" y="131" text-anchor="middle">Collection / Playlist detail</text>
+<rect class="box" x="290" y="106" width="150" height="40" rx="8"/><text x="365" y="131" text-anchor="middle">Song info → Tag editor</text>
+<rect class="fut" x="470" y="106" width="170" height="40" rx="8"/><text x="555" y="131" text-anchor="middle">Settings (future)</text>
+<path class="ln" d="M160 76v30M365 76v30M555 76v30"/>
+<rect class="hub" x="60" y="178" width="580" height="46" rx="12"/><text x="350" y="198" text-anchor="middle" font-weight="700">Dock: mini player + search field (every browsing screen, above the keyboard)</text><text class="sub" x="350" y="215" text-anchor="middle">Search opens a full results screen; mini player opens Now Playing</text>
+<path class="lnd" d="M160 146v32M365 146v32M555 146v32"/>
+<text x="350" y="252" text-anchor="middle" font-weight="700">Now Playing = Cover | Lyrics (future) | Up next  —  one transport, chips: Sleep timer · Add to playlist</text>
+</svg></div>
+<div class="panel"><h4>Essential interaction rules</h4><ul class="tight">
+<li>Lens choice is remembered. At large text or below 360 px the lens row becomes a labelled picker, never a clipped strip.</li>
+<li>The dock is present on library, collection, playlist, settings and info screens. It hides under the tag editor and the add-songs picker, where the primary button takes its place.</li>
+<li>Tapping the search field opens Search; the field stays docked above the keyboard so results and typing are both reachable one-handed.</li>
+<li>Now Playing faces are tabs, not swipes. Swipe is an optional accelerator; the tabs are the accessible path.</li>
+<li>Back: closes overlays first (system UI, dialog, sheet, player), then pops the screen stack, then returns to Songs, then leaves the app. A dirty editor or a non-empty selection asks before discarding.</li>
+<li>Every rule that hides content (folders, minimum length) is explained where it is felt: the pill on counts, the footer in playlists and favourites, the hint under empty search results.</li>
+</ul></div>
+</div>
+<div id="g-c2"></div>
+<div class="pc">
+<div><h4>Strongest advantages</h4><ul class="tight"><li>Search and playback are always one thumb-length away, on every screen, without a second persistent band.</li><li>Queue editing never hides play/pause or the timeline; the queue is a face of the player, not a modal over it.</li><li>Hidden-content rules are explained where they bite, which makes the folder-visibility contract (files, playlists and queue preserved) legible rather than mysterious.</li><li>Single root means Back behaviour is simple and predictable.</li></ul></div>
+<div><h4>Actual compromises</h4><ul class="tight"><li>No dedicated “continue listening” page. Resume is the mini player; recently played is a tile under Playlists. If the owner wants a history-first experience this is weaker than Rooms.</li><li>The dock is a new composition; the search field costs 48 px on browsing screens and needs a solid fallback where blur is expensive.</li><li>Three faces in Now Playing put Lyrics (a future feature) in view before it exists. The prototype shows the empty state honestly; the risk is that it looks like a broken feature until lyrics ship.</li></ul></div>
+<div><h4>Greatest uncertainty</h4><p>Whether people discover that the mini player opens the full player when the search field sits directly under it, and whether the Up next face is found without a “Queue” label on the cover face. Both are cheap to test and cheap to fix (a label under the chip; a first-run hint).</p></div>
+</div>
+</section>
+
+<!-- =============== C3 =============== -->
+<section class="concept" id="c3" style="--c:#8A4B00">
+<div class="cname"><h2>C3 · Stage</h2><span class="pr">Organising principle: <b>the player is the app</b>. Playback is always on stage; the library is a sheet you raise over it.</span></div>
+<p>Stage inverts the usual hierarchy. The app opens on a persistent player that shows artwork, transport, a horizontal “Up next” strip and a library sheet resting at the bottom. Raising the sheet compacts the stage into a slim bar with the waveform and play button; the sheet holds search, the five lenses and every management screen. There is no separate Now Playing screen to open or close and no mini player: the stage is the player at every size.</p>
+<div class="cols two">
+<div class="ia"><h4 style="margin:0 0 8px">Product / IA map</h4>
+<svg viewBox="0 0 700 250" role="img" aria-label="Stage IA map: persistent player stage with Up next strip; library sheet below with search, lenses and management; settings and timer from the stage header">
+<rect class="hub" x="60" y="16" width="580" height="64" rx="12"/><text x="350" y="40" text-anchor="middle" font-weight="700">Stage (always present)</text><text class="sub" x="350" y="60" text-anchor="middle">Artwork · title · favourite/lyrics/playlist · timeline · transport · Up next strip · header: sleep timer, settings</text>
+<rect class="box" x="60" y="112" width="580" height="46" rx="12"/><text x="350" y="132" text-anchor="middle" font-weight="700">Library sheet (drag or tap to raise; stage compacts to a bar)</text><text class="sub" x="350" y="150" text-anchor="middle">Search field · Songs · Playlists · Albums · Artists · Folders</text>
+<path class="ln" d="M350 80v32"/>
+<rect class="box" x="60" y="188" width="180" height="40" rx="8"/><text x="150" y="213" text-anchor="middle">Collection / Playlist</text>
+<rect class="box" x="260" y="188" width="180" height="40" rx="8"/><text x="350" y="213" text-anchor="middle">Song info / editor</text>
+<rect class="fut" x="460" y="188" width="180" height="40" rx="8"/><text x="550" y="213" text-anchor="middle">Settings (future)</text>
+<path class="ln" d="M150 158v30M350 158v30M550 80v108"/>
+</svg></div>
+<div class="panel"><h4>Essential interaction rules</h4><ul class="tight">
+<li>Two sheet positions only: resting (stage full, four rows visible) and raised (stage compact). A tap on the handle toggles; drag is an accelerator.</li>
+<li>Compact stage keeps play/pause, the waveform and title. Tapping it lowers the sheet.</li>
+<li>Up next strip scrolls horizontally; “Edit” opens a vertical queue list inside the sheet with drag handles and multi-select.</li>
+<li>Lyrics (future) and Up next are faces of the sheet, alongside Library, when the stage is full.</li>
+<li>Back: lowers a raised sheet before popping any screen inside it. From resting position Back leaves the app.</li>
+<li>With nothing playing, the stage shows the last session paused, or on first run a “Pick a song” stage with the sheet raised.</li>
+</ul></div>
+</div>
+<div id="g-c3"></div>
+<div class="pc">
+<div><h4>Strongest advantages</h4><ul class="tight"><li>Strongest identity of the three; artwork and colour lead every screen, which is where the owner asked for expressiveness.</li><li>Playback is never more than visible; there is no mini/full split to learn and no transition to wait for.</li><li>The Up next strip makes the queue visible without opening anything.</li></ul></div>
+<div><h4>Actual compromises</h4><ul class="tight"><li>Browsing gets the smaller half of the screen; deliberate library work (large libraries, long lists, folder management) happens in a sheet with four to six rows visible at 100% text and fewer at 160%.</li><li>Sheet drag competes with list scroll, queue reorder and edge-back gestures; the tap-to-toggle fallback makes it usable but the two-position model still has to be learned.</li><li>Landscape needs its own composition; a horizontal strip plus a sheet does not fit 390 px of height.</li><li>Missing artwork makes the stage look empty for much of a file-derived library (24 of the 41 captured rows use fallback initials today).</li></ul></div>
+<div><h4>Greatest uncertainty</h4><p>Whether people with large, messy libraries accept browsing in a half-height sheet. The 825-song library on Hormoz, with 718 files in one Quick Share folder, is exactly the case this concept serves worst.</p></div>
+</div>
+</section>
+
+<!-- =============== TASKS =============== -->
+<section id="tasks">
+<h2>Shared task walkthroughs</h2>
+<p>Every concept is walked through the same tasks. Counts are taps or drags from the library’s resting state, with the app already open and a session paused, unless stated. Recovery cases are marked. The Dock column is exercised in the <a href="prototype.html">interactive prototype</a>; the others are walked on the static mockups.</p>
+<div class="tbl"><table>
+<thead><tr><th>Task</th><th>C1 Rooms</th><th>C2 Dock</th><th>C3 Stage</th></tr></thead>
+<tbody>
+<tr><td><b>T1 First launch → first song</b> (permission, then play)</td><td>Allow → Listen shows only shortcuts (no history) → Library tab → row. 4 taps. The empty Listen room is the weakest first impression.</td><td>Allow → Songs list is already the first screen → row. 2 taps. Gate states (denied, blocked, empty, read error) each have one recovery button.</td><td>Allow → sheet is raised over an empty stage that says “Pick a song” → row. 2 taps; the empty stage is a large dead area until then.</td></tr>
+<tr><td><b>T2 Find and play “Benevis”</b> by name</td><td>Search tab → type → row. 3 taps + typing. Recent searches help repeats.</td><td>Dock search field → type → row. 2 taps + typing from any screen, keyboard never covers the field.</td><td>Raise sheet (1) → search field → type → row. 3 taps + typing; the compact stage stays visible above the keyboard.</td></tr>
+<tr><td><b>T3 Queue two songs, then reorder</b></td><td>⋮ → Play next; ⋮ → Add to queue (4 taps); mini player → Queue chip → sheet with drag handles (2 taps). Transport hidden while reordering.</td><td>Same 4 taps for queuing, with a named Undo snackbar; mini player → Up next face (2 taps). Transport and timeline remain on screen during reorder; multi-select removal with Undo.</td><td>Same 4 taps; Up next strip is already visible; Edit (1 tap) opens the vertical list in the sheet with the compact stage on top.</td></tr>
+<tr><td><b>T4 Save the playing song to a new playlist</b></td><td>Mini player → Playlist chip → New playlist → name → Create. 5 taps + typing. Blank/duplicate names are inline errors.</td><td>Mini player → Add to playlist → New playlist → name → Create. 5 taps + typing; Favourites is a switch in the same sheet so it cannot be mistaken for a playlist.</td><td>Playlist icon on the stage → same sheet. 4 taps + typing.</td></tr>
+<tr><td><b>T5 Pause after this song, then change</b></td><td>Mini player → Sleep timer chip → End of this song (3 taps). Change: chip → Change → pick → Apply (4). Status shown on the chip and in the mini player.</td><td>Mini player → Sleep timer chip → End of this song (3). Change: chip → Change time → pick → Apply (4). The chip shows a ring for duration timers and “After this song” for end-of-song; the mini player carries a moon glyph.</td><td>Moon in the stage header → End of this song (2). Change: same 3. Status is a ring on the header moon; nothing else changes.</td></tr>
+<tr><td><b>T6 Hide the Quick Share folder, then recover</b> (future Settings)</td><td>Listen → gear → Folders → switch (4 taps). Recovery: the Library shows counts drop; the “n hidden” pill is present in Library only; Undo in the snackbar.</td><td>Folders lens → ⋮ → Hide (3 taps) or Settings → Folders → switch (4). Recovery: pill on every lens, hidden-folder section in Folders with Show, hint under empty search results, footer row in playlists, Undo in the snackbar.</td><td>Raise sheet → Folders → ⋮ → Hide (4). Recovery: pill in the sheet’s Folders lens, Undo. The stage keeps playing the hidden folder’s song, which demonstrates the queue rule visibly.</td></tr>
+<tr><td><b>T7 Fix an artist tag and share the file</b></td><td>⋮ → Song info → Edit → change → Save → Android consent → Share (7 taps + typing). Editor covers nav and mini player.</td><td>Same count; the editor replaces the dock with a panel that states the file will be rewritten; Song info shows the “index pending” banner after saving; Share opens the simulated chooser.</td><td>Same count inside the sheet; the compact stage stays on top of the editor and warns if the edited song is the current one.</td></tr>
+<tr><td><b>R1 Recovery: file deleted outside Daria</b></td><td>Playing it shows an error in Now Playing with “Play next song”; the mini player turns red. Nothing skips automatically.</td><td>Same rule; in addition the row shows a “File missing” badge in every list, Share is refused with an explanation, and the queue row offers removal.</td><td>Same rule; the stage shows the error card over the artwork.</td></tr>
+<tr><td><b>R2 Recovery: leave the tag editor with unsaved edits</b></td><td colspan="3">All three: Back or close asks “Discard your changes?” with Keep editing as the safe default. Android’s denial of file access keeps the draft and offers Try again.</td></tr>
+</tbody></table></div>
+</section>
+
+<!-- =============== COMPARE =============== -->
+<section id="compare">
+<h2>Comparison against the criteria</h2>
+<div class="tbl"><table>
+<thead><tr><th>Criterion (weight)</th><th>C1 Rooms</th><th>C2 Dock</th><th>C3 Stage</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>Findability (20)</td><td><span class="score s4">4</span></td><td><span class="score s5">5</span></td><td><span class="score s3">3</span></td><td>Dock puts search on every screen; Rooms needs a tab switch; Stage hides browsing in a half sheet.</td></tr>
+<tr><td>Task clarity (15)</td><td><span class="score s4">4</span></td><td><span class="score s5">5</span></td><td><span class="score s4">4</span></td><td>All three regroup actions by consequence; Dock also explains hidden-content rules where they bite.</td></tr>
+<tr><td>Listening continuity (15)</td><td><span class="score s3">3</span></td><td><span class="score s4">4</span></td><td><span class="score s5">5</span></td><td>Stage never leaves the player; Dock keeps transport during queue edits; Rooms’ queue sheet covers the transport.</td></tr>
+<tr><td>Reachability (12)</td><td><span class="score s4">4</span></td><td><span class="score s5">5</span></td><td><span class="score s3">3</span></td><td>Dock’s search and player are at the bottom; Stage’s lenses and search sit mid-screen only when the sheet is raised.</td></tr>
+<tr><td>Information density (8)</td><td><span class="score s3">3</span></td><td><span class="score s4">4</span></td><td><span class="score s2">2</span></td><td>Two bands vs one dock vs a half sheet.</td></tr>
+<tr><td>Accessibility (10)</td><td><span class="score s4">4</span></td><td><span class="score s4">4</span></td><td><span class="score s3">3</span></td><td>Stage depends on a sheet gesture with a tap fallback and loses rows at large text; Dock’s lens picker at large text is explicit.</td></tr>
+<tr><td>Brand character (8)</td><td><span class="score s3">3</span></td><td><span class="score s4">4</span></td><td><span class="score s5">5</span></td><td>Stage is the most distinctive; Dock concentrates identity in the player tint and the Daria tile; Rooms is the most generic.</td></tr>
+<tr><td>Delight (6)</td><td><span class="score s3">3</span></td><td><span class="score s4">4</span></td><td><span class="score s4">4</span></td><td>Hypotheses: the resume card, the face switch with tinted transport, the always-visible strip.</td></tr>
+<tr><td>Feasibility (6)</td><td><span class="score s5">5</span></td><td><span class="score s4">4</span></td><td><span class="score s2">2</span></td><td>Rooms is closest to the design system; Stage needs a coordinated sheet, gesture arbitration and a landscape variant.</td></tr>
+<tr class="win"><td><b>Weighted total (max 500)</b></td><td class="num"><b>378</b></td><td class="num"><b>451</b></td><td class="num"><b>352</b></td><td>Dock leads on the heaviest criteria and has no score below 4.</td></tr>
+</tbody></table></div>
+<p><small>Weighted total = Σ weight × score. Rooms: 20·4+15·4+15·3+12·4+8·3+10·4+8·3+6·3+6·5 = 378. Dock: 20·5+15·5+15·4+12·5+8·4+10·4+8·4+6·4+6·4 = 451. Stage: 20·3+15·4+15·5+12·3+8·2+10·3+8·5+6·4+6·2 = 352.</small></p>
+</section>
+
+<section id="recommend">
+<h2>Recommendation: develop Dock, keep Stage’s stage as an experiment</h2>
+<p><b>Dock is recommended.</b> It wins on the two heaviest criteria because it removes a decision (which room am I in?) rather than adding a surface, and because the two most frequent actions in a large local library, searching and controlling playback, are within thumb reach on every screen. It preserves every contract without a modal queue and explains the one new rule (hidden content) everywhere the rule is felt. Its weaknesses are testable and cheap to fix: discoverability of the player faces and the absence of a history-first page.</p>
+<p><b>What Dock borrows, with sources.</b> A direct Library entry and lens row (current app, Round 2). Search as a global, always-present affordance (Figma F05 makes it a tab; Dock docks it instead). Queue reachable without leaving transport (a reaction to Figma F03 and capture 34, which both cover the transport). The end-of-song timer status in the mini player (capture 27). The folder rule explanation (Round 2 settings copy, rewritten). None of these is adopted because it is precedent; each is adopted because it scored better against a criterion above.</p>
+<p><b>What is kept for later.</b> Rooms’ Listen page is not needed to ship Dock; if usage or the owner shows that resume-and-revisit dominates, a “Listening” lens or a resume card at the top of Songs can be added without changing the architecture. Stage’s persistent player is the most expressive idea in this set; it is proposed as a validation experiment (a “Stage” mode reachable from Now Playing) rather than the default, because it costs browsing density and feasibility for a library like the one captured.</p>
+<div class="callout"><b>Owner decisions required before build.</b> (1) Accept a single-root library with no Home. (2) Accept that Lyrics appears as a face with an honest empty state before the feature exists, or hold the face behind a flag until lyrics ship. (3) Confirm the hidden-content rule: hidden songs remain in playlists, favourites, history and the queue, are listed under a “hidden” footer, and can be played from there. (4) Confirm “Save queue as playlist” as a new capability, or drop it.</div>
+</section>
+
+<section id="references">
+<h2>Head-to-head: the recommendation against each reference</h2>
+<div class="tbl"><table>
+<thead><tr><th>Reference</th><th>Adopted</th><th>Rejected</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td><b>Current app</b> <span class="ev">current-app/01–41</span></td><td>Direct Songs entry; five categories; persistent mini player; timer contract and copy structure (presets start at once, custom needs Start, Change keeps the running timer); editor warnings; delete/clear dialogs that say files stay on the phone; named queue confirmations.</td><td>Search behind a header icon; two differently ordered action sheets (28 vs 37); queue as a sheet over the transport; “This song is playing” wording when paused (31); initials as missing-art fallback; timer status as a non-interactive mini-player label (27) is replaced by a glyph in the artist line plus the same information in the player chip.</td><td>The current app’s contracts are sound and were verified on device; its presentation scatters global actions across corners and sheets. Dock keeps the behaviour and relocates the affordances.</td></tr>
+<tr><td><b>Round 1</b> <span class="ev">references/round-1</span></td><td>From Lens: direct library entry with an attached player. From Component options: the attached (not floating) player, chosen for contrast and reachability. From Sessions: the idea that resume matters, carried as the mini player and the Recently played tile rather than a page.</td><td>The Gallery direction (artwork-led home): with 24 of 41 captured rows lacking embedded art, an art-led entry would be mostly fallbacks. The Sessions bottom navigation. Giant initials as covers. The illustrative bottom gesture decoration.</td><td>Round 1 explored entry points; its own notes ask whether a second destination is worth its cost. Dock answers no for v1 and keeps the door open.</td></tr>
+<tr><td><b>Round 2</b> <span class="ev">references/round-2</span></td><td>Visible Settings gear on the library header; Library / Appearance grouping; folder rule copy (“files, playlists and the current queue are preserved”); large-text category picker; distinct illustrative covers; neutral hierarchy with a single blue emphasis; Vazirmatn.</td><td>The Apply/Discard draft for folder and duration changes (replaced by immediate switches with Undo, because every change is reversible and the preview count is shown before choosing); “unknown duration is always kept” as a fixed rule (it becomes a default with a switch); Lyrics as a separate bottom action; Queue “n of m” as a bottom action (it becomes a face); the Reduce effects toggle (deferred, the system setting is respected instead).</td><td>Round 2 is the closest ancestor. Dock differs where the draft model added ceremony to reversible actions, and where secondary surfaces were still separate destinations.</td></tr>
+<tr><td><b>Figma reference</b> <span class="ev">figma/F01–F10</span></td><td>Search as a global affordance (relocated from a tab to the dock); per-second waveform seek bar with disabled scrubbing while buffering and while duration is unknown; independent shuffle/repeat; play/pause colour derived from cover art with a neutral fallback (Dock derives the whole player tint, not only the button); queue rows with drag handles and an active-track indicator.</td><td>Home / Search / Library bottom navigation; Home with “personal mixes” (no local source of mixes is established); the Liquid Glass surface across headers, rows and navigation (readability over variable artwork, rendering cost, and no fallback shown); the incomplete pilot frames; the pale green base palette.</td><td>The Figma file documents intentions well but its Home relies on content the product does not have, and its full-surface glass would have to survive 825 covers of varying contrast. Dock uses blur only on the dock, with a solid fallback.</td></tr>
+</tbody></table></div>
+</section>
+
+<footer class="site">Part 2 of the Daria redesign dossier. Next: <a href="design.html">Final design</a> · <a href="prototype.html">Prototype</a>. Mockups rendered from <code>assets/concepts.js</code> (C1, C3) and <code>assets/proto.js</code> (C2).</footer>
+</main>
+<script src="assets/icons.js"></script>
+<script src="assets/kit.js"></script>
+<script src="assets/proto.js"></script>
+<script src="assets/concepts.js"></script>
+<script src="assets/doc.js"></script>
+<script>
+const o = {theme:'light'};
+const ph = (inner, opt={}) => DK.phone(inner, Object.assign({theme:'light'}, opt));
+DKdoc.gallery('g-c1', [
+  {html: ph(DK.C1.listen(o)), cap:'Listen (home)', txt:'Resume card, recently played, shortcuts. Shown with history; on first run only shortcuts appear.'},
+  {html: ph(DK.C1.library(o)), cap:'Library', txt:'Same five lenses; mini player above the three-tab bar.'},
+  {html: ph(DK.C1.search(o)), cap:'Search room', txt:'Global search as a destination, keyboard below results.'},
+  {html: ph(DK.C1.np(o)), cap:'Now Playing', txt:'Full-screen sheet; four chips for queue, lyrics (future), timer, playlist.'},
+  {html: ph(DK.C1.np(o,'queue')), cap:'Queue sheet', txt:'Modal over the player, as in Figma F03 and capture 34. Transport hidden.'},
+  {html: ph(DK.C1.settings(o)), cap:'Settings (future)', txt:'Reached from the Listen header gear. Adds a switch to hide history.'},
+  {html: ph(DK.C1.folders(o)), cap:'Hide a folder', txt:'Switch with Undo. Hidden state only surfaces in the Library room.'},
+]);
+const prep = fn => st => { fn(st); };
+DKdoc.gallery('g-c2', [
+  {st:{}, cap:'Library · Songs', txt:'One root, five lenses, dock with mini player and search.'},
+  {prep: st=>{ st.np={face:'cover'}; }, cap:'Now Playing · Cover', txt:'Tint from artwork; fixed transport; chips for timer and playlist.'},
+  {prep: st=>{ st.np={face:'queue'}; }, cap:'Now Playing · Up next', txt:'Queue as a face of the player. Transport stays.'},
+  {prep: st=>{ st.stack.push({id:'search'}); st.search.q='Mahasti'; st.kb=true; }, cap:'Search', txt:'Field docked above the keyboard, results above it.'},
+  {prep: st=>{ st.hidden.add('QuickShare'); st.stack=[{id:'library',lens:'folders'}]; }, cap:'Folder hidden', txt:'Hidden section with Show; amber pill on every lens.'},
+  {prep: st=>{ st.stack.push({id:'settings'}); }, cap:'Settings (future)', txt:'Library rules, appearance, later lyrics folder.'},
+  {prep: st=>{ st.np={face:'cover'}; st.sheet={type:'timer'}; }, cap:'Sleep timer', txt:'Same contract as the shipped timer, restyled.'},
+]);
+DKdoc.gallery('g-c3', [
+  {html: ph(DK.C3.home(o)), cap:'Stage, sheet resting', txt:'Player always on top; library sheet with four rows visible.'},
+  {html: ph(DK.C3.browse(o)), cap:'Sheet raised', txt:'Stage compacts to a bar; library fills the rest.'},
+  {html: ph(DK.C3.lyrics(o)), cap:'Lyrics face (future)', txt:'Sheet faces: Lyrics, Up next, Library.'},
+  {html: ph(DK.C3.timer(o)), cap:'Sleep timer', txt:'From the stage header moon; same presets and rules.'},
+  {html: ph(DK.C3.settings(o)), cap:'Settings (future)', txt:'Inside the sheet; adds a launch-position preference.'},
+  {html: ph(DK.C3.hidden(o)), cap:'Folder hidden', txt:'Pill in the Folders lens; the stage keeps playing the hidden folder’s song.'},
+]);
+</script>
+</body>
+</html>

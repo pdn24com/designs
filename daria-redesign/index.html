@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Daria Redesign Dossier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/doc.css">
+<link rel="stylesheet" href="assets/kit.css">
+<style>
+.parts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:14px;margin:18px 0}
+.parts a{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--rule);border-radius:16px;padding:16px 18px}
+.parts a:hover{border-color:var(--lapis)}
+.parts b{display:block;font-family:"Vazirmatn",sans-serif;font-size:17px;margin-bottom:4px}
+.parts small{display:block;color:var(--ink3);margin-bottom:6px;letter-spacing:.06em;text-transform:uppercase;font-size:11.5px;font-weight:700}
+.parts span{color:var(--ink2);font-size:14.5px}
+.hero-shots{display:flex;gap:18px;overflow-x:auto;padding:12px 6px 6px}
+</style>
+</head>
+<body>
+<nav class="topnav" id="topnav"></nav>
+<main class="wrap">
+<header class="hero">
+  <div class="kicker">Daria Music Player · Product and experience redesign · 28 September 2026</div>
+  <h1>One library, one dock, a player with faces</h1>
+  <p class="lede">Concise owner summary of an informed redesign built from the supplied package: the installed app on Hormoz, both prior design rounds and the Figma reference. Three concepts were developed against fixed criteria; <b>Dock</b> is recommended and carried through to an interactive prototype, decision register, coverage ledger, handoff and validation plan.</p>
+  <div class="meta"><span>Deliverables are self-contained HTML; no repository, network service or Figma edit was needed</span><span>All interactions are browser simulations; no audio, files or Android services are touched</span></div>
+</header>
+
+<div id="g-hero" class="hero-shots"></div>
+
+<section>
+<h2>Read the dossier</h2>
+<div class="parts">
+  <a href="diagnosis.html"><small>Part 1</small><b>Product diagnosis</b><span>Evidence inventory, strengths, ten ranked problems, capability and status map, the questions that matter and open assumptions.</span></a>
+  <a href="concepts.html"><small>Part 2</small><b>Three concepts</b><span>Rooms, Dock and Stage with IA maps, comparable mockups, shared task walkthroughs, weighted comparison, recommendation and a head-to-head with every reference.</span></a>
+  <a href="design.html"><small>Part 3</small><b>Final design</b><span>Structure and back behaviour, 60+ rendered states, dark / RTL / small / large-text / landscape, visual system, motion, accessibility, decision register, critique.</span></a>
+  <a href="prototype.html"><small>Prototype</small><b>Interactive Dock prototype</b><span>Browsing to playback, queue, playlists, sleep timer, tag editing and sharing, Settings and Lyrics (future), permission and error recovery, in English and Persian.</span></a>
+  <a href="handoff.html"><small>Part 4</small><b>Engineering handoff</b><span>Component and state contracts, behaviour and motion specs, content rules, accessibility acceptance, staged rollout and the coverage ledger.</span></a>
+  <a href="validation.html"><small>Part 5</small><b>Validation plan</b><span>Participants, prioritised tasks with success and failure observations, six experiments, technical checks and remaining risks.</span></a>
+</div>
+</section>
+
+<section>
+<h2>Decisions worth debating</h2>
+<ol class="walk">
+<li><b>No Home page and no navigation bar.</b> One library with five lenses; resume lives in the mini player. The Rooms concept is kept in case the owner believes “continue listening” is the dominant job. <a href="design.html#register">D2</a></li>
+<li><b>Hidden songs stay in playlists, favourites and the queue, and can be played from there.</b> The owner invariant requires preservation of files, playlists and the queue; extending it to favourites and history, and allowing playback from the playlist footer, needs a yes. <a href="design.html#register">D7</a></li>
+<li><b>Settings apply immediately with Undo</b> instead of Round 2’s Apply/Discard draft, with the number each option hides shown before choosing. <a href="design.html#register">D6</a></li>
+<li><b>The Lyrics face is visible before lyrics exist</b>, with an honest empty state and a per-song file import as the first release. Alternatively it ships behind a flag. <a href="design.html#register">D8</a></li>
+<li><b>“Save queue as playlist”</b> is offered as a new capability from the queue overflow. It is one menu row to remove. <a href="design.html#register">D14</a></li>
+</ol>
+</section>
+
+<section>
+<h2>Improvements with the strongest support</h2>
+<ul class="tight">
+<li><b>Search in the dock.</b> The most general way into an 825-song library moves from the least reachable corner to the thumb, on every screen, above the keyboard. Evidence: current placement <span class="ev">01</span>; library size <span class="ev">flows.md</span>.</li>
+<li><b>Queue as a face of the player.</b> The contract’s selection, reorder and Undo get a home that never covers play/pause. Evidence: sheet over transport <span class="ev">34</span>, Figma F03.</li>
+<li><b>One song menu grouped by consequence.</b> Two differently ordered menus become one. Evidence: <span class="ev">28, 37</span>.</li>
+<li><b>Hidden content explained where it is felt.</b> Pill, explainer sheet, playlist footer and search hint turn the folder invariant into something visible. Evidence: owner requirement; Round 2 copy.</li>
+<li><b>Contracts preserved, presentation consolidated.</b> Timer (one chip, one glyph, every contract state), editor (six failure states, changed-field marks, digit normalisation preview, correct playing/current copy), sharing (actual file). Evidence: <span class="ev">19–33</span>, feature-contracts.md.</li>
+<li><b>Every gate and error state designed:</b> first run, denied, blocked, loading, empty, read error, refresh failure, observer unavailable, missing file, unknown duration, all hidden.</li>
+</ul>
+</section>
+
+<section>
+<h2>Creative bets</h2>
+<ul class="tight">
+<li><b>The dock</b> as a single thumb-reach surface for search and playback, translucent with a solid fallback.</li>
+<li><b>Player faces</b> (Cover, Lyrics, Up next) sharing one fixed transport, with the whole player tinted from the artwork.</li>
+<li><b>The Daria tile</b>: a generated, per-album tinted lattice with a note glyph instead of initials, so a library without embedded art still looks like a library and still colours the player.</li>
+<li><b>Stage</b> (Concept C3), a player-first layout, kept as an experiment rather than the default.</li>
+</ul>
+</section>
+
+<section>
+<h2>What remains unproven</h2>
+<ul class="tight">
+<li>No participant has used any of this. The <a href="validation.html">validation plan</a> lists nine tasks and six experiments with decision rules.</li>
+<li>Nothing has run on Android. Frame rate, blur cost, TalkBack order, contrast over real artwork, timer timing and file writes are specified, not demonstrated.</li>
+<li>Persian strings are drafts for native review.</li>
+<li>Counts in the prototype (hidden songs, short files, unknown durations) are simulated around the observed 825-song baseline.</li>
+<li>Lyrics content, covers and several tracks in the prototype are illustrative; every capture-derived title is listed in <code>assets/kit.js</code> with its source.</li>
+</ul>
+</section>
+
+<section>
+<h2>How the package was used</h2>
+<p>All 92 files were extracted and verified against the manifest hashes (92 of 92 matched). Every capture, Figma frame and prior-round image was read; the seven offline previews were rendered headless to read their text. No repository, device or Figma edit access was used or needed. The prototype and documents are self-contained HTML in this folder; <code>exports/</code> holds PNG renders of the key screens.</p>
+</section>
+<footer class="site">Daria redesign dossier · prepared 28 September 2026 · Fonts: Vazirmatn (SIL OFL), IBM Plex (SIL OFL) · Icons: Lucide (ISC) · Licences in <code>assets/licenses</code>.</footer>
+</main>
+<script src="assets/icons.js"></script><script src="assets/kit.js"></script><script src="assets/proto.js"></script><script src="assets/doc.js"></script>
+<script>
+DKdoc.gallery('g-hero', [
+  {st:{}, cap:'Library with the dock'},
+  {prep:st=>{st.np={face:'cover'};st.pb.playing=true;st.pb.pos=97;}, cap:'Now Playing · Cover'},
+  {prep:st=>{st.np={face:'queue'};}, cap:'Now Playing · Up next'},
+  {prep:st=>{st.lang='fa';st.theme='dark';}, cap:'Persian · dark'},
+  {prep:st=>{st.hidden.add('QuickShare');st.sheet={type:'why'};}, cap:'Hidden content explained'},
+  {prep:st=>{st.stack.push({id:'settings-duration'});}, cap:'Settings (future)'},
+], 0.5);
+</script>
+</body>
+</html>

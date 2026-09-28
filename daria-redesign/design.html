@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Daria Dock Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/doc.css">
+<link rel="stylesheet" href="assets/kit.css">
+<style>
+.sw{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:12px 0}
+.sw div{border:1px solid var(--rule);border-radius:12px;overflow:hidden;background:var(--card);font-size:12.5px}
+.sw i{display:block;height:54px}
+.sw b{display:block;padding:6px 10px 0;font-family:"IBM Plex Mono",monospace;font-size:12px}
+.sw span{display:block;padding:0 10px 8px;color:var(--ink3)}
+.type-s{display:flex;flex-direction:column;gap:6px;font-family:"Vazirmatn",sans-serif}
+.type-s div{display:flex;gap:14px;align-items:baseline;border-bottom:1px dashed var(--rule);padding:6px 0}
+.type-s small{font-family:"IBM Plex Mono",monospace;min-width:190px;color:var(--ink3)}
+</style>
+</head>
+<body>
+<nav class="topnav" id="topnav"></nav>
+<main class="wrap">
+<header class="hero">
+  <div class="kicker">Part 3 · Final design</div>
+  <h1>Dock, developed</h1>
+  <p class="lede">The recommended concept carried across every capability: navigation and back behaviour, states for loading, permission, empty, error, disabled, success, cancellation and unsaved changes, the visual system, motion as behaviour, accessibility, and the decision register that explains each consequential change.</p>
+  <div class="meta"><span>Interactive: <a href="prototype.html">prototype.html</a></span><span>Screens below are rendered live from the prototype engine, so they match its behaviour exactly</span></div>
+  <div class="toc"><a href="#structure">Structure</a><a href="#states">Screens and states</a><a href="#adapt">Dark, RTL, small, large, landscape</a><a href="#visual">Visual system</a><a href="#motion">Motion</a><a href="#a11y">Accessibility</a><a href="#register">Decision register</a><a href="#critique">Critique and revisions</a><a href="#changes">Major changes</a></div>
+</header>
+
+<section id="structure">
+<h2>Structure, navigation and back behaviour</h2>
+<div class="cols two">
+<div class="panel"><h3>Screen stack</h3>
+<p>There is one root, the Library, with five lenses. Everything else is pushed on top of it: collection and playlist detail, the add-songs picker, search, song info, the tag editor, and the three Settings screens. Now Playing is an overlay above the stack, not a screen in it, so it can open from anywhere and close back to the same place. Sheets, dialogs and simulated system UI are layers above that.</p>
+<p><b>Entry.</b> Android’s native splash leads into the last-used lens with the last session paused in the dock. First run shows the permission gate instead of the list.</p>
+<p><b>Back, in order.</b> System UI → dialog → sheet → selection mode inside the queue → Now Playing → screen stack → the Songs lens → leave the app (playback continues in the notification). A dirty editor and a non-empty picker selection interrupt Back with a discard dialog whose safe default is “Keep”.</p>
+<p><b>Persistence.</b> Lens, sort, player face, lyrics-face scroll and Settings values persist across launches. Search text does not. The queue, position and timer persist per the contracts; a reboot discards the timer.</p>
+</div>
+<div class="panel"><h3>Action hierarchy</h3>
+<p>Each song has exactly one menu, grouped by consequence and identical in every list and in the player:</p>
+<ul class="tight"><li><b>This listening session:</b> Play now · Play next · Add to queue</li><li><b>Keep:</b> Add to playlist… (Favourites is the heart in the sheet header and a switch inside Add to playlist)</li><li><b>Go to:</b> Album · Artist (· Folder from the player)</li><li><b>File:</b> Song info · Share file</li></ul>
+<p>Destructive file operations do not exist in Daria; the only file write is Save in the tag editor, which says so before the button is enabled. Playlist and queue removals say “the file stays on your phone” where a person might doubt it.</p>
+<p><b>Feedback.</b> Every reversible action posts a named snackbar with Undo (“Gisooye Baran plays next · Undo”). Irreversible or system-mediated actions (file save, share) use banners and dialogs instead of snackbars.</p>
+</div>
+</div>
+</section>
+
+<section id="states">
+<h2>Screens and states</h2>
+<p>Rendered from the prototype engine. Captions name the state and the contract or capture that requires it.</p>
+<h3>Entry, permission and library health</h3>
+<div id="g-entry"></div>
+<h3>Library lenses and hidden content</h3>
+<div id="g-lib"></div>
+<h3>Now Playing: faces, timer and recovery</h3>
+<div id="g-np"></div>
+<h3>Queue and playlists</h3>
+<div id="g-q"></div>
+<h3>Song info, tag editing and sharing</h3>
+<div id="g-ed"></div>
+<h3>Settings (future) and Lyrics (future)</h3>
+<div id="g-set"></div>
+</section>
+
+<section id="adapt">
+<h2>Dark, RTL, small screen, large text and landscape</h2>
+<div id="g-adapt"></div>
+<div class="callout"><b>Text overflow rule.</b> Titles and artists are single-line with ellipsis at 100–125% text; at 130% and above rows switch to wrapping (two lines maximum for the title, the artist below) so meaning is never hidden. Counts, durations and timer digits use tabular numerals and never truncate. Mixed Persian/Latin metadata uses <code>unicode-bidi: plaintext</code> per field so “Diana Hadad - نیک موزیک” keeps its own direction inside an RTL row. The timeline is always left-to-right: elapsed time on the left, remaining or total on the right, in both locales <span class="tag con">Contract</span>.</div>
+</section>
+
+<section id="visual">
+<h2>Visual system</h2>
+<div class="cols two">
+<div class="panel"><h3>Typography</h3>
+<p>One family, Vazirmatn (SIL OFL), for Latin and Persian, so mixed metadata does not change texture mid-line. Weights 400, 500, 700, 800. Sizes scale with the system font setting; three sizes are capped (wordmark 1.2×, app bar title 1.3×, player title 1.35×) so headers do not consume the screen at 200%.</p>
+<div class="type-s">
+<div><small>Display 23/800</small><span style="font-size:23px;font-weight:800">Benevis · بگردم</span></div>
+<div><small>Title 20/700</small><span style="font-size:20px;font-weight:700">Song info · اطلاعات آهنگ</span></div>
+<div><small>Row title 15.5/600</small><span style="font-size:15.5px;font-weight:600">Cheghadr Mahi ~ UpMusic</span></div>
+<div><small>Body 15/400</small><span style="font-size:15px">Saving rewrites the file on this phone.</span></div>
+<div><small>Secondary 13/400</small><span style="font-size:13px;color:var(--ink3)">Mahasti - GahMusic.com · 3:58</span></div>
+<div><small>Label 12.5/700 caps</small><span style="font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink3)">This listening session</span></div>
+</div></div>
+<div class="panel"><h3>Colour</h3>
+<p>Neutral surfaces with a slight blue bias; one accent (lapis) for controls, selection and links; semantic amber for “hidden”, red for errors and destructive confirmations. The player is the one place colour is expressive: its background and transport tint derive from the artwork’s dominant hue (fallback: the neutral tint). Contrast targets: 4.5:1 for text, 3:1 for icons and control edges, in both themes; the tint is mixed with the surface at fixed ratios so artwork can never push text below target. Not yet measured on device.</p>
+<div class="sw">
+<div><i style="background:#2E4E9E"></i><b>#2E4E9E</b><span>accent · light</span></div>
+<div><i style="background:#A3B8FF"></i><b>#A3B8FF</b><span>accent · dark</span></div>
+<div><i style="background:#F6F7FB"></i><b>#F6F7FB</b><span>bg · light</span></div>
+<div><i style="background:#0C1019"></i><b>#0C1019</b><span>bg · dark</span></div>
+<div><i style="background:#141A2B"></i><b>#141A2B</b><span>ink · light</span></div>
+<div><i style="background:#FAEBCF"></i><b>#FAEBCF / #7F4E00</b><span>hidden (amber)</span></div>
+<div><i style="background:#FBE3E0"></i><b>#FBE3E0 / #B3261E</b><span>error / destructive</span></div>
+<div><i style="background:#6B4A2F"></i><b>tint</b><span>player, from artwork</span></div>
+</div></div>
+<div class="panel"><h3>Spacing, density, shape</h3>
+<p>8-pt rhythm. Rows are 64 px at 100% text with 48 px covers; a 390-px phone shows eight rows above the dock, six with the mini player. Corner radii: 8 rows/covers, 12 fields, 16 mini player, 22 player artwork, 26 sheets and dialogs. Sheets and dialogs are the only elevated surfaces; lists are flat. The dock is a translucent surface with a 1-px top line and a solid fallback.</p>
+<h3>Icons</h3>
+<p>Lucide outline icons at 24 px (18 px inside pills and chips), 2-px stroke, filled variants only for play, pause, skip and the favourite heart. Icons never appear without a label except for the standard transport and the ⋮ menu, which carry accessible names.</p></div>
+<div class="panel"><h3>Artwork behaviour</h3>
+<p>Embedded art is shown at 48, 56, 120 px and full width. Missing art shows the <b>Daria tile</b>: a generated eight-point-star lattice tinted from a hash of the album name with a small note glyph. It never shows initials or digits. In the player the tile also drives the tint, so a missing-art song still gets a coloured player. Album grids clamp titles to two lines; artists use round tiles.</p>
+<h3>Component states</h3>
+<p>Every control has enabled, pressed, focus-visible (3-px accent ring), disabled (42% opacity, never removed) and, where relevant, selected states. Rows add current (accent title + moving bars), hidden (55% opacity + amber badge) and missing (red badge). Fields add changed (accent border + “Changed” label), error (red border + message), normalised (“Will be saved as 1401”).</p></div>
+</div>
+</section>
+
+<section id="motion">
+<h2>Motion as behaviour</h2>
+<div class="tbl"><table>
+<thead><tr><th>Moment</th><th>Purpose</th><th>Trigger</th><th>Duration</th><th>Interruption / reversal</th><th>Reduced motion</th><th>Risk</th></tr></thead>
+<tbody>
+<tr><td>Open Now Playing</td><td>Continuity between mini player and player</td><td>Tap mini player; optional upward drag</td><td>280–360 ms, decelerate</td><td>Drag is reversible mid-way; Back reverses</td><td>Cross-fade 120 ms; no translation</td><td>Artwork upscale jank on low-end devices: pre-decode the large cover when the mini player appears</td></tr>
+<tr><td>Face switch (Cover / Lyrics / Up next)</td><td>Show that the transport did not move</td><td>Tab tap; optional horizontal swipe</td><td>180–220 ms fade + 8 px slide</td><td>Tabs are idempotent; swipe can be abandoned</td><td>Instant swap</td><td>None significant</td></tr>
+<tr><td>Player tint change</td><td>Signal a new track without reading text</td><td>Track change</td><td>400–600 ms colour interpolation</td><td>New change restarts from current colour</td><td>Instant</td><td>Colour extraction cost: compute once per cover, cache by file</td></tr>
+<tr><td>Sheet open / close</td><td>Menu belongs to the row or player below</td><td>Tap ⋮ or a chip; scrim tap, Back or drag to close</td><td>260–320 ms</td><td>Drag reverses; Back always closes</td><td>Fade 120 ms</td><td>None</td></tr>
+<tr><td>Timer ring</td><td>Remaining time at a glance</td><td>Duration timer active</td><td>Updates once per minute; last 5 s once per second</td><td>Stops on cancel; freezes on save failure</td><td>Same (not decorative)</td><td>None</td></tr>
+<tr><td>Fade-out at expiry</td><td>Contract: last five seconds fade the player’s own gain</td><td>Timer end</td><td>5 s, audio only</td><td>Deliberate play during the fade cancels the expiry? No: contract says expiry still pauses; the notice explains</td><td>Not visual</td><td>Audio behaviour, not a UI animation; the “Fading out…” notice is static</td></tr>
+<tr><td>Row press and current-song bars</td><td>Feedback and “this is playing”</td><td>Press; playing state</td><td>Press 80 ms; bars 900 ms loop</td><td>Bars stop on pause</td><td>Bars become a static three-bar glyph</td><td>Looping animation in long lists: only the current row animates</td></tr>
+<tr><td>Snackbar</td><td>Confirm and offer Undo</td><td>Reversible action</td><td>Enter 150 ms; stays 6 s</td><td>New snackbar replaces; Undo dismisses</td><td>Instant</td><td>Never covers the transport in the player</td></tr>
+</tbody></table></div>
+<p><b>Blur.</b> The dock uses an 18-px backdrop blur with 86% surface opacity, so text on it always sits on at least 86% solid surface; contrast does not depend on what scrolls beneath. On devices where the design system reports blur as expensive, or when the person enables “Remove animations” in Android, the dock renders solid. Full-surface glass, as in Figma F06/F07, is not used.</p>
+</section>
+
+<section id="a11y">
+<h2>Accessibility requirements</h2>
+<div class="cols two">
+<div class="panel"><h3>Names and reading order</h3>
+<ul class="tight">
+<li>Row: one button named “Title, Artist, now playing” + a ⋮ button named “More options: Title”. Duration is part of the row name, not a separate stop.</li>
+<li>Mini player: “Open player: Title” (full-row button), then Play/Pause, then Next. The timer glyph adds “Sleep timer: 12 minutes” to the artist line’s name.</li>
+<li>Player: source button, then faces tablist, then face content, then the seek slider (valuetext “0:01 of 3:58”, disabled when duration is unknown), transport, chips. Notices are <code>role=status</code> and precede the faces.</li>
+<li>Hidden pill: “9 hidden. Why some songs are hidden” so the purpose is announced with the count.</li>
+<li>Sheets are modal dialogs with the title as the accessible name; focus moves to the title and returns to the trigger.</li>
+</ul></div>
+<div class="panel"><h3>Targets, gestures, motion</h3>
+<ul class="tight">
+<li>Minimum 48×48 dp for every control; 44 dp only inside dense rows of the queue where the row itself is also a target.</li>
+<li>No gesture-only path: face swipe, sheet drag, player drag-down and queue drag-to-reorder all have tap alternatives (tabs, scrim/Back, chevron, Move up/down in the row menu).</li>
+<li>Android “Remove animations” is respected for every transition; the timer ring and current-song bars keep information but not motion.</li>
+<li>Large text: lens row becomes a picker at 130%+; the dock becomes a single row (mini player + search icon) at 130%+ or below 330 px width; wrapping rows replace ellipsis.</li>
+<li>Colour is never the only signal: hidden and missing rows have badges, changed fields have labels, the current song has bars.</li>
+</ul></div>
+</div>
+<p><small>None of this has been checked with TalkBack. It is a specification for the build and a plan item in the validation plan.</small></p>
+</section>
+
+<section id="register">
+<h2>Decision register</h2>
+<p>Each entry: problem and evidence; alternatives; recommendation and its effect on the mental model; costs; reversibility and owner approval; what would change the decision.</p>
+<div class="tbl"><table>
+<thead><tr><th>ID</th><th>Problem / evidence</th><th>Alternatives considered</th><th>Recommendation and effect</th><th>Costs and implications</th><th>Reversible? Owner?</th><th>What would change it</th></tr></thead>
+<tbody>
+<tr><td><b>D1</b></td><td>Search is the farthest control from the thumb on a 6.7-inch phone <span class="ev">01</span>; an 825-song library is mostly reached by name.</td><td>Keep header icon (current). Search tab (Figma F05). Always-visible field under the header (Round 1 option). Docked field above the mini player.</td><td>Dock the field. Mental model: “what I touch most is at the bottom.” Search is one tap on every browsing screen and stays above the keyboard.</td><td>48 px of list height on browsing screens; a new composition for the design system; blur cost with a solid fallback.</td><td>Reversible in layout. No owner approval needed.</td><td>If observation shows people hunt for search in the header, add a header icon that focuses the docked field (both can coexist).</td></tr>
+<tr><td><b>D2</b></td><td>The owner asks whether the main experience needs a navigation bar; Figma and Sessions add one; the current app has none.</td><td>Three tabs (Rooms). Two tabs (Library / Listening). None, with lenses under one root.</td><td>None. One root removes the “which room am I in” decision and keeps Back simple. Effect: the app is a library with a player attached, not a set of destinations.</td><td>No history-first page; resume relies on the mini player and the Recently played tile.</td><td>Reversible (a lens or a resume card can be added). Owner decision: accept no Home.</td><td>Evidence that repeat listeners open the app mainly to resume or revisit, not to browse.</td></tr>
+<tr><td><b>D3</b></td><td>The queue sheet covers the transport <span class="ev">34</span>; the contract wants selection, reorder, removal with Undo and stable current-item identity.</td><td>Keep the modal sheet. Separate Queue screen. Queue as a face of the player.</td><td>Face of the player with a fixed transport. Effect: “the player has three views”; reordering never loses play/pause or seek.</td><td>Less vertical room for the list than a full screen; the queue needs its own scroll region; multi-select toolbar must not cover the transport.</td><td>Reversible. No approval.</td><td>If people do not find Up next behind a tab (validation T3), add a “Queue” chip on the Cover face that switches faces.</td></tr>
+<tr><td><b>D4</b></td><td>Two differently ordered action sheets for one song <span class="ev">28, 37</span>; the owner asks whether Add should be one action.</td><td>One “Add…” action with a second step. Keep two menus. One menu grouped by consequence.</td><td>One menu grouped by consequence (session / keep / go to / file), identical everywhere. Play next and Add to queue stay separate verbs with named Undo; Add to playlist stays separate because it persists.</td><td>The sheet is long (nine rows); at large text it scrolls.</td><td>Reversible. No approval.</td><td>If the two queue verbs are confused in testing, collapse to “Add to queue” with a “Play next” switch inside the confirmation.</td></tr>
+<tr><td><b>D5</b></td><td>Favourites is listed among playlist destinations <span class="ev">36</span>, yet it is not renameable or deletable <span class="tag con">Contract</span>.</td><td>Keep it as a row. Make it a switch at the top of Add to playlist plus the heart in the player and in the sheet header.</td><td>Switch + heart. Effect: favouriting is a property of a song; playlists are containers.</td><td>One more control type in the sheet.</td><td>Reversible. No approval.</td><td>None expected.</td></tr>
+<tr><td><b>D6</b></td><td>Owner requirement: Settings with folders, minimum duration and appearance; Round 2 used an Apply/Discard draft with count preview.</td><td>Draft with Apply (Round 2). Immediate with Undo. Immediate with confirmation.</td><td>Immediate with Undo, and the count each option hides shown before choosing. Effect: settings feel like switches, not forms; mistakes are undone in one tap.</td><td>A folder switch may re-scan counts; the snackbar must not race the list update. No “impact preview” of a combined change; the pill on the library does that job.</td><td>Reversible. No approval.</td><td>If a re-count takes more than ~300 ms on large libraries, fall back to the draft model for folders only.</td></tr>
+<tr><td><b>D7</b></td><td>Hidden songs remain in playlists and the queue <span class="tag own">Owner</span>; Round 2 also preserved favourites and history. Boundary and unknown-duration rules are unresolved.</td><td>Silently drop hidden songs from playlists in view. Show them greyed. Show them under an expandable footer with a count.</td><td>Footer with count and Show/Hide toggle; songs remain playable from there. Equality kept (a 30 s song stays at a 30 s limit). Unknown duration kept by default, with a switch. Effect: hiding changes browsing, never membership.</td><td>Playing a hidden song from a playlist means a hidden song can be “now playing” while absent from Songs; the player’s Go to › Folder explains it.</td><td>Reversible. <b>Owner decision:</b> favourites/history preserved; hidden songs playable from playlists.</td><td>Owner preference for view-only footers, or evidence that people expect hidden songs to vanish everywhere.</td></tr>
+<tr><td><b>D8</b></td><td>Lyrics are an owner-requested future feature with no settled source.</td><td>Online provider. Local-only from embedded tags and per-song files. Folder of .lrc files matched by file name.</td><td>Local-only MVP: embedded USLT (plain) and SYLT (synced) tags, plus a per-song “Add lyrics file” picker. Synced lines are tappable to seek. Lyrics face shows an honest empty state. Effect: lyrics belong to the file, like tags.</td><td>Most of a file-derived library will show “No lyrics”. The face is visible before the feature ships.</td><td>Reversible (feature flag). <b>Owner decision:</b> visible empty face pre-launch.</td><td>If the owner has a rights-cleared source, add an “Online” section in Settings › Lyrics later, off by default.</td></tr>
+<tr><td><b>D9</b></td><td>Timer status is shown in three placements, one non-interactive <span class="ev">26–27</span>.</td><td>Keep all three. One chip only. Chip in the player + glyph in the mini player.</td><td>Chip with a ring (duration) or “After this song” (end of song), plus a glyph in the mini-player artist line. Overflow entry removed. Effect: one place to act, one place to glance.</td><td>People who used the overflow entry must learn the chip; the mini-player glyph is not a control.</td><td>Reversible. No approval.</td><td>If the glyph is mistaken for a button, make it open the timer sheet.</td></tr>
+<tr><td><b>D10</b></td><td>Timer contract details: +10 beyond 180 must be refused; Change keeps the running timer; save failure is a distinct state; expiry is quiet.</td><td>None; these are contracts.</td><td>Presented as: inline banner for the +10 refusal with “Change time”; draft sheet with “Keep current timer”; red banner with “Retry saving”; quiet pause with a dismissible “Paused by sleep timer” notice in the player and mini player.</td><td>None beyond copy.</td><td>Not a change.</td><td>A contract change by the owner.</td></tr>
+<tr><td><b>D11</b></td><td>Editor copy says “This song is playing” while paused <span class="ev">31</span>.</td><td>Keep. Distinguish playing vs current.</td><td>“This song is playing. It will pause for a moment while saving” when playing; “This is the current song. Saving may briefly interrupt it” when paused.</td><td>Two strings.</td><td>Not a behaviour change.</td><td>None.</td></tr>
+<tr><td><b>D12</b></td><td>Missing artwork is the common case; initials carry no meaning <span class="ev">01, 06</span>.</td><td>Initials (current). Generic note icon (Figma). Generated tinted tile.</td><td>Generated Daria tile per album name, with the note glyph. Effect: the library looks consistent and the player still gets a colour.</td><td>Generation cost (cache per album); tiles can look samey in a grid of singles.</td><td>Reversible. No approval.</td><td>If tiles are mistaken for real art, add a subtle “no cover” treatment in Song info only (already shown there).</td></tr>
+<tr><td><b>D13</b></td><td>Authored playlists are below the fold in Playlists <span class="ev">03</span>.</td><td>Keep smart tiles first. Authored first, smart as compact tiles after.</td><td>Authored first with a visible “New playlist” button; smart collections as compact two-column tiles below.</td><td>Smart collections lose prominence.</td><td>Reversible. No approval.</td><td>Usage showing smart collections dominate.</td></tr>
+<tr><td><b>D14</b></td><td>“Save queue as playlist” does not exist; a queue is a temporary session <span class="tag con">Contract</span>.</td><td>Not offered. Offered from the queue overflow.</td><td>Offered as a proposal in the queue overflow; it creates a normal playlist from the current occurrences (duplicates collapsed).</td><td>New capability; blurs the temporary/saved boundary slightly, mitigated by the naming dialog.</td><td>Reversible. <b>Owner decision.</b></td><td>Owner declines; it is one menu row to remove.</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="critique">
+<h2>Critique through four lenses, and what changed</h2>
+<div class="cols">
+<div class="panel"><h4>Product designer</h4><p><b>Weakness found:</b> the first version showed the amber “hidden” pill at the shipped 30-second default, which would have told every new user that nine songs were hidden before they touched a setting. <b>Revised:</b> the pill appears only after the person changes a library rule; the default rule is still listed inside the explainer sheet so it is discoverable.</p></div>
+<div class="panel"><h4>UI/UX designer</h4><p><b>Weakness found:</b> the three-face tablist overflowed at 160% text on a 320-px phone, and the wordmark took a third of the header. <b>Revised:</b> labels collapse to icons with accessible names at large text; the wordmark and titles cap their scale. The metadata row stacks vertically in large-text mode.</p></div>
+<div class="panel"><h4>Product manager</h4><p><b>Weakness found:</b> the concept comparison scored Dock highest partly because it is the one with an interactive prototype. <b>Response:</b> the criteria and weights were fixed before scoring, the other two concepts have comparable mockups for the same screens, and the two heaviest criteria (findability, continuity) are argued from tap counts and control positions, not from polish. The bias is acknowledged in the validation plan: Rooms’ resume card and Stage’s persistent player are named as experiments to run.</p></div>
+<div class="panel"><h4>End user</h4><p><b>Weakness found:</b> hiding a folder from its ⋮ menu felt too easy for something that removes 718 songs from view. <b>Revised:</b> the menu row states the count and “Files are not deleted”, the snackbar names the folder and count with Undo, and the Folders lens keeps hidden folders visible with Show. Not revised: no confirmation dialog, because the action is fully reversible in one tap and the contract guarantees nothing is lost.</p></div>
+</div>
+<h3>Final consistency check</h3>
+<ul class="tight">
+<li>Every song menu (list, collection, playlist, search, queue, player) uses the same four groups and verbs.</li>
+<li>Every reversible action has a named snackbar with Undo; every system-mediated one has a banner or dialog.</li>
+<li>Every gated or empty state has exactly one primary recovery action and, where the contract offers it, one secondary.</li>
+<li>Every future capability (Settings screens, Lyrics face, lyrics folder, save-queue) is labelled Future or Proposal in this dossier and in the prototype annotations.</li>
+<li>Persian strings exist for every visible label in the prototype; digits follow the locale except in file names and technical values.</li>
+</ul>
+</section>
+
+<section id="changes">
+<h2>Explanation of the major changes</h2>
+<ol class="walk">
+<li><b>Search moves from the header to the dock.</b> It is the most general way into a large local library and the current placement is the least reachable one. Nothing about search behaviour changes; it gains typed results and a hidden-folder hint.</li>
+<li><b>The queue becomes a face of the player.</b> The contract’s selection, reorder and Undo semantics get a permanent home that never covers the transport.</li>
+<li><b>One song menu, grouped by consequence.</b> The two shipped menus are merged; verbs are unchanged.</li>
+<li><b>Hidden content is explained where it is felt.</b> New pill, explainer sheet, playlist footer and search hint make the folder invariant visible instead of mysterious.</li>
+<li><b>Settings and Lyrics are designed as future features</b> with immediate, undoable settings and a local-first lyrics scope.</li>
+<li><b>The Daria tile replaces initials</b> and gives every song a colour for the player.</li>
+<li><b>Timer and editor keep their contracts</b>; their presentation is consolidated (one chip, one glyph; changed-field marks, six failure states, correct “playing vs current” copy).</li>
+</ol>
+</section>
+<footer class="site">Part 3 of the Daria redesign dossier. Next: <a href="handoff.html">Engineering handoff</a>.</footer>
+</main>
+<script src="assets/icons.js"></script><script src="assets/kit.js"></script><script src="assets/proto.js"></script><script src="assets/doc.js"></script>
+<script>
+const G = DKdoc.gallery;
+G('g-entry', [
+  {prep:st=>{st.perm='first';st.pb.session=false;}, cap:'First run · permission gate', txt:'Explains why access is needed and that nothing is uploaded.', ev:'Contract: first-load state · NOT_RUN on device'},
+  {prep:st=>{st.perm='first';st.pb.session=false;st.sys={type:'perm'};}, cap:'Android permission dialog (simulated)', txt:'System UI; imitated and labelled.', ev:'SIMULATED'},
+  {prep:st=>{st.perm='denied';st.pb.session=false;}, cap:'Access denied', txt:'One recovery action; copy says the library stays empty.', ev:'Contract: permission denied'},
+  {prep:st=>{st.perm='blocked';st.pb.session=false;}, cap:'Permanently blocked', txt:'Open app settings + Check again.', ev:'Contract: permanently blocked recovery'},
+  {prep:st=>{st.lib='loading';st.pb.session=false;}, cap:'Reading the library', txt:'Skeleton rows; count increments; lenses disabled.', ev:'Contract: first load'},
+  {prep:st=>{st.lib='empty';st.pb.session=false;}, cap:'No music found', txt:'Names supported formats; index lag explained.', ev:'Contract: genuinely empty library'},
+  {prep:st=>{st.lib='readError';st.pb.session=false;}, cap:'Initial read failed', txt:'Retry; files unaffected.', ev:'Contract: initial read failure'},
+  {prep:st=>{st.refreshFailed=true;}, cap:'Refresh failed · catalogue retained', txt:'Persistent banner with the last successful time and Retry.', ev:'Contract: failed refresh retains catalogue'},
+  {prep:st=>{st.hidden=new Set(['audios','DariaValidation','Download','QuickShare']);}, cap:'Everything hidden by settings', txt:'Filtered-empty state links to Library settings.', ev:'Owner requirement: recovery affordance'},
+]);
+G('g-lib', [
+  {st:{}, cap:'Songs lens', txt:'Count, sort pill, shuffle; rows with Daria tiles for missing art.', ev:'Redesigns 01'},
+  {prep:st=>{st.stack=[{id:'library',lens:'playlists'}];}, cap:'Playlists lens', txt:'Authored first, smart collections as tiles.', ev:'Redesigns 03 (D13)'},
+  {prep:st=>{st.stack=[{id:'library',lens:'albums'}];}, cap:'Albums lens', txt:'Grid; two-line titles.', ev:'Redesigns 11'},
+  {prep:st=>{st.stack=[{id:'library',lens:'folders'}];st.hidden.add('QuickShare');}, cap:'Folders with one hidden', txt:'Hidden section with Show; amber pill.', ev:'Owner requirement (D7)'},
+  {prep:st=>{st.hidden.add('QuickShare');st.sheet={type:'why'};}, cap:'Why some songs are hidden', txt:'Lists folder and length rules; one-tap Show.', ev:'Proposal (D7)'},
+  {prep:st=>{st.hidden.add('QuickShare');st.stack.push({id:'search'});st.search.q='Benevis';st.kb=true;}, cap:'Search with hidden match', txt:'No visible match; hint names the hidden count and links to folders.', ev:'Owner requirement: search behaviour'},
+  {prep:st=>{st.stack.push({id:'collection',kind:'folder',key:'audios'});}, cap:'Folder detail', txt:'Play / Shuffle; ⋮ offers Play next, Add to queue, Hide.', ev:'Redesigns 16'},
+  {prep:st=>{st.sheet={type:'song',song:'ghoroub',ctx:'lib'};}, cap:'Song menu', txt:'Four groups; heart in the header.', ev:'Redesigns 28 + 37 (D4)'},
+  {prep:st=>{st.sheet={type:'sort'};}, cap:'Sort', txt:'Same option again reverses; direction shown.', ev:'Redesigns 02'},
+]);
+G('g-np', [
+  {prep:st=>{st.np={face:'cover'};}, cap:'Cover face', txt:'Tint from artwork; chips for timer and playlist.', ev:'Redesigns 18/40'},
+  {prep:st=>{st.np={face:'cover'};st.pb.playing=true;st.pb.pos=97;}, cap:'Playing', txt:'Pause glyph; progress on the waveform.', ev:'Redesigns 40'},
+  {prep:st=>{st.np={face:'cover'};st.sheet={type:'timer'};}, cap:'Sleep timer · off', txt:'Presets start at once; custom needs Start.', ev:'Retains 19'},
+  {prep:st=>{st.np={face:'cover'};st.tm.mode='dur';st.tm.end=st.clock+1798000;st.tm.total=1800;st.sheet={type:'timer'};}, cap:'Timer · 30 min running', txt:'+10, Change time, Cancel.', ev:'Retains 20'},
+  {prep:st=>{st.np={face:'cover'};st.tm.mode='dur';st.tm.end=st.clock+175*60000;st.tm.total=175*60;st.tm.plusErr=true;st.sheet={type:'timer'};}, cap:'+10 refused at the 180-min cap', txt:'Explains and offers Change time; never adds fewer minutes.', ev:'Contract'},
+  {prep:st=>{st.np={face:'cover'};st.tm.mode='dur';st.tm.end=st.clock+1722000;st.tm.total=1800;st.tm.draft={pick:null};st.tm.custom='181';st.tm.err='bad';st.sheet={type:'timer'};}, cap:'Change draft · invalid 181', txt:'Running timer continues; Keep current timer.', ev:'Retains 21–23'},
+  {prep:st=>{st.np={face:'cover'};st.tm.mode='eos';st.tm.targetOcc=st.pb.q[st.pb.idx].occ;st.tm.targetId='benevis';}, cap:'End of song armed', txt:'Chip reads “After this song”; sheet shows target and time left.', ev:'Retains 25–26'},
+  {prep:st=>{st.np={face:'cover'};st.tm.mode='dur';st.tm.end=st.clock+1500000;st.tm.total=1800;st.tm.saveFailed=true;st.sheet={type:'timer'};}, cap:'Timer running but not saved', txt:'Distinct state with Retry saving; deadline unchanged.', ev:'Contract: save failure'},
+  {prep:st=>{st.np={face:'cover'};st.notice='timerDone';st.tm.firedAt=st.clock-600000;}, cap:'Paused by sleep timer', txt:'Quiet notice on return; play clears it.', ev:'Contract: finish and persistence'},
+  {prep:st=>{st.missing.add('kaftare');st.pb.idx=st.pb.q.findIndex(o=>o.id==='kaftare');st.pb.err='missing';st.pb.playing=false;st.np={face:'cover'};}, cap:'File missing', txt:'No automatic skip; Play next song or Remove from queue.', ev:'Contract: unavailable file'},
+  {prep:st=>{st.pb.idx=st.pb.q.findIndex(o=>o.id==='rec014');st.np={face:'cover'};}, cap:'Unknown duration', txt:'Dashed timeline, seek disabled, “Unknown length”.', ev:'Contract: unknown duration is not zero'},
+  {prep:st=>{st.np={face:'cover'};st.sheet={type:'npMenu'};}, cap:'Player overflow', txt:'Go to album / artist / folder; Song info; Share.', ev:'Redesigns 28'},
+]);
+G('g-q', [
+  {prep:st=>{st.np={face:'queue'};}, cap:'Up next face', txt:'Earlier collapsed; drag handles; ⋮ per row.', ev:'Redesigns 34 (D3)'},
+  {prep:st=>{st.np={face:'queue'};st.qSel=new Set([st.pb.q[st.pb.idx+1].occ,st.pb.q[st.pb.idx+3].occ]);}, cap:'Select and remove', txt:'Multi-select toolbar below the list; Undo after removal.', ev:'Contract: selection, removal with Undo'},
+  {prep:st=>{st.np={face:'queue'};st.dialog={type:'clearQ'};}, cap:'Clear queue', txt:'Says playback stops, files stay, timer cancels.', ev:'Retains 35 + contract'},
+  {prep:st=>{st.np={face:'queue'};st.sheet={type:'qMenu'};}, cap:'Queue overflow', txt:'Save queue as playlist (proposal) and Clear.', ev:'D14'},
+  {prep:st=>{st.stack=[{id:'library',lens:'playlists'},{id:'playlist',key:'custom'}];st.hidden.add('QuickShare');}, cap:'Playlist with hidden songs', txt:'Footer counts hidden members; Show reveals them greyed and playable.', ev:'Owner requirement (D7)'},
+  {prep:st=>{st.stack=[{id:'library',lens:'playlists'},{id:'playlist',key:'p1'}];st.playlists.unshift({id:'p1',name:'Daria Design Review',n:0,items:[]});}, cap:'Empty playlist', txt:'Add songs is the only action.', ev:'Retains 05'},
+  {prep:st=>{st.stack=[{id:'library',lens:'playlists'},{id:'playlist',key:'custom'},{id:'picker',key:'custom',q:''}];st.pick=new Set(['ghoroub','forever']);}, cap:'Add songs · 2 selected', txt:'Already-added songs are labelled; button names the count.', ev:'Retains 06–06b'},
+  {prep:st=>{st.stack=[{id:'library',lens:'playlists'},{id:'playlist',key:'custom'},{id:'picker',key:'custom',q:''}];st.pick=new Set(['ghoroub']);st.dialog={type:'discardPick'};}, cap:'Leave with a selection', txt:'Keep selecting is the safe default.', ev:'Contract: retained draft'},
+  {prep:st=>{st.stack=[{id:'library',lens:'playlists'}];st.dialog={type:'newPl',v:'custom',err:'errDup'};}, cap:'Duplicate name', txt:'Inline error; counter.', ev:'Contract: blank/duplicate feedback'},
+  {prep:st=>{st.stack=[{id:'library',lens:'playlists'}];st.dialog={type:'deletePl',id:'test5'};}, cap:'Delete playlist', txt:'Songs stay on the phone; Undo after.', ev:'Retains 09–10'},
+]);
+G('g-ed', [
+  {prep:st=>{st.stack.push({id:'info',key:'benevis'});}, cap:'Song info', txt:'Sources named; lyrics section; file and audio facts.', ev:'Redesigns 29–30'},
+  {prep:st=>{st.stack.push({id:'info',key:'forever'});}, cap:'Non-MP3 file', txt:'Edit disabled with the reason; Share still available.', ev:'Contract: MP3 only'},
+  {prep:st=>{st.stack.push({id:'info',key:'ghoroub'});}, cap:'Title from file name', txt:'Marked as not an embedded tag.', ev:'Contract: identify source'},
+  {prep:st=>{st.stack.push({id:'info',key:'benevis'});DK.App.ACT.edit(st,'benevis');}, cap:'Editor · clean', txt:'Save disabled until a valid change; bottom panel states the file write.', ev:'Redesigns 31–32 (D11)'},
+  {prep:st=>{st.stack.push({id:'info',key:'benevis'});DK.App.ACT.edit(st,'benevis');st.ed.v.a='Mahasti';st.ed.v.y='۱۴۰۱';st.ed.v.tr='3/x';st.ed.cover='remove';}, cap:'Editor · changes and errors', txt:'Changed marks, digit normalisation preview, invalid track number, cover removal preview.', ev:'Contract: validation, normalisation'},
+  {prep:st=>{st.stack.push({id:'info',key:'benevis'});DK.App.ACT.edit(st,'benevis');st.ed.v.a='Mahasti';st.sys={type:'modify'};}, cap:'Android write consent (simulated)', txt:'Denial keeps the draft.', ev:'SIMULATED · contract'},
+  {prep:st=>{st.stack.push({id:'info',key:'benevis'});DK.App.ACT.edit(st,'benevis');st.ed.v.a='Mahasti';st.ed.status='denied';}, cap:'Consent denied', txt:'Edits retained; Try again.', ev:'Contract'},
+  {prep:st=>{st.stack.push({id:'info',key:'benevis'});DK.App.ACT.edit(st,'benevis');st.ed.v.a='Mahasti';st.ed.status='ext';}, cap:'File changed outside Daria', txt:'Reload tags; draft kept.', ev:'Contract'},
+  {prep:st=>{st.stack.push({id:'info',key:'benevis'});DK.App.ACT.edit(st,'benevis');st.ed.v.a='Mahasti';st.ed.status='writeFail';}, cap:'Interrupted write', txt:'Restore original is offered; no success claimed.', ev:'Contract'},
+  {prep:st=>{st.stack.push({id:'info',key:'benevis'});DK.App.ACT.edit(st,'benevis');st.ed.v.a='Mahasti';st.ed.status='space';}, cap:'Not enough space', txt:'Names the amount to free.', ev:'Contract'},
+  {prep:st=>{st.stack.push({id:'info',key:'benevis',pending:true,saved:{t:'Benevis',a:'Mahasti'}});}, cap:'Saved · index pending', txt:'Distinguishes saved-to-file from index update.', ev:'Contract'},
+  {prep:st=>{st.stack.push({id:'info',key:'benevis'});st.sys={type:'share',id:'benevis'};}, cap:'Share chooser (simulated)', txt:'Actual audio file with temporary read access.', ev:'Redesigns 33 · SIMULATED'},
+]);
+G('g-set', [
+  {prep:st=>{st.stack.push({id:'settings'});}, cap:'Settings', txt:'Library, Appearance, Lyrics (later), About.', ev:'FUTURE · owner requirement'},
+  {prep:st=>{st.stack.push({id:'settings-folders'});st.hidden.add('QuickShare');}, cap:'Folders', txt:'Switches with Undo; paths and counts.', ev:'FUTURE (D6)'},
+  {prep:st=>{st.stack.push({id:'settings-duration',review:true});}, cap:'Minimum song length', txt:'Counts per option; unknown-length switch; review list.', ev:'FUTURE (D7)'},
+  {prep:st=>{st.stack.push({id:'settings'});st.observeOff=true;}, cap:'Automatic updates unavailable', txt:'Separate warning; manual refresh still works.', ev:'Contract: observer failure'},
+  {prep:st=>{st.pb.idx=st.pb.q.findIndex(o=>o.id==='nightletters');st.pb.pos=24;st.np={face:'lyrics'};}, cap:'Lyrics · synced', txt:'Current line emphasised; tap a line to seek.', ev:'FUTURE (D8) · illustrative lyrics'},
+  {prep:st=>{st.pb.idx=st.pb.q.findIndex(o=>o.id==='bluehour');st.np={face:'lyrics'};}, cap:'Lyrics · plain', txt:'Labelled “Not synced”.', ev:'FUTURE (D8)'},
+  {prep:st=>{st.np={face:'lyrics'};}, cap:'Lyrics · none', txt:'Explains the local source and offers a file import.', ev:'FUTURE (D8)'},
+  {prep:st=>{st.np={face:'lyrics'};st.sys={type:'pickLrc'};}, cap:'Lyrics file picker (simulated)', txt:'System file picker; per-song association.', ev:'SIMULATED'},
+]);
+G('g-adapt', [
+  {st:{theme:'dark'}, cap:'Dark · Songs', ev:'Tokens redefined; blur dock 84%'},
+  {prep:st=>{st.theme='dark';st.np={face:'cover'};}, cap:'Dark · player', ev:'Tint lightened for dark surfaces'},
+  {st:{lang:'fa'}, cap:'Persian · RTL', txt:'Mirrored layout; per-field bidi; Persian digits.', ev:'Owner requirement'},
+  {prep:st=>{st.lang='fa';st.np={face:'queue'};}, cap:'Persian · Up next', txt:'Timeline stays left-to-right.', ev:'Contract: timeline direction'},
+  {prep:st=>{st.lang='fa';st.theme='dark';st.stack.push({id:'settings-duration'});}, cap:'Persian · dark · Settings', ev:'FUTURE'},
+  {st:{w:320,h:640}, cap:'Small phone 320×640', txt:'Lens picker replaces the strip.', ev:'Round 2 also tested 320'},
+  {st:{w:320,h:640,scale:1.6}, cap:'320 px at 160% text', txt:'Wrapping rows; single-row dock; capped headers.', ev:'Large-text adaptation'},
+  {prep:st=>{st.w=320;st.h=640;st.scale=1.6;st.np={face:'cover'};}, cap:'Player at 160% text', txt:'Face labels collapse to icons with names.', ev:'Large-text adaptation'},
+  {prep:st=>{st.land=true;st.np={face:'cover'};}, cap:'Landscape player', txt:'Two-column arrangement, not a shrunken portrait.', ev:'Prior QA: landscape clipping'},
+  {prep:st=>{st.rm=true;st.solid=true;st.pb.playing=true;}, cap:'Reduced motion · solid dock', txt:'Static current-song glyph; no blur.', ev:'Accessibility'},
+]);
+</script>
+</body>
+</html>
